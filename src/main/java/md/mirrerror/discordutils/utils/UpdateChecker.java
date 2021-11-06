@@ -24,7 +24,9 @@ public class UpdateChecker {
                 if(!latestVersion.equalsIgnoreCase(version)) {
                     Main.getInstance().getLogger().info("There is a new plugin version available! Make sure to update!");
                     Main.getInstance().getLogger().info("Your version: " + version + "; latest version: " + latestVersion + ".");
-                    Main.getInstance().getLogger().info("Link: http://rubukkit.org/threads/misc-discordutils-v1-0-discord-bot-dlja-servera-minecraft-1-7.179479/");
+                    Main.getInstance().getLogger().info("Links:");
+                    Main.getInstance().getLogger().info("SpigotMC: https://www.spigotmc.org/resources/discordutils-discord-bot-for-your-minecraft-server.97433/");
+                    Main.getInstance().getLogger().info("RuBukkit: http://rubukkit.org/threads/misc-discordutils-v1-0-discord-bot-dlja-servera-minecraft-1-7.179479/");
                 } else {
                     Main.getInstance().getLogger().info("You're up to date.");
                 }
