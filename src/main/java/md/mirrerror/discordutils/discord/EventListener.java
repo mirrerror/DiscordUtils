@@ -1,10 +1,16 @@
 package md.mirrerror.discordutils.discord;
 
+import md.mirrerror.discordutils.Main;
 import md.mirrerror.discordutils.config.Message;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class EventListener extends ListenerAdapter {
@@ -51,6 +57,24 @@ public class EventListener extends ListenerAdapter {
                 event.getChannel().sendMessageEmbeds(embedManager.successfulEmbed(Message.COMMAND_EXECUTED.getText())).queue();
                 break;
             }
+        }
+    }
+
+    @Override
+    public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
+        if(DiscordUtils.hasTwoFactor(event.getUser())) {
+            if(!event.getPrivateChannel().equals(Objects.requireNonNull(event.getUser()).openPrivateChannel().complete())) return;
+            Player player = DiscordUtils.getPlayer(event.getUser());
+            if(player == null) return;
+            if(event.getReaction().getReactionEmote().getName().equals("✅")) {
+                BotController.getTwoFactorPlayers().remove(player);
+                player.sendMessage(Message.TWOFACTOR_AUTHORIZED.getText(true));
+                BotController.getSessions().put(player.getUniqueId(), StringUtils.remove(player.getAddress().getAddress().toString(), '/'));
+            }
+            if(event.getReaction().getReactionEmote().getName().equals("❎")) {
+                Bukkit.getScheduler().runTask(Main.getInstance(), () -> player.kickPlayer(Message.TWOFACTOR_REJECTED.getText()));
+            }
+            event.getChannel().deleteMessageById(event.getMessageId()).queue();
         }
     }
 

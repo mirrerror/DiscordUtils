@@ -11,6 +11,7 @@ import javax.security.auth.login.LoginException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class BotController {
 
@@ -22,6 +23,7 @@ public class BotController {
 
     private static Map<String, User> linkCodes = new HashMap<>();
     private static Map<Player, String> twoFactorPlayers = new HashMap<>();
+    private static Map<UUID, String> sessions = new HashMap<>();
 
     public static void setupBot(String token) {
         Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
@@ -70,5 +72,9 @@ public class BotController {
 
     public static List<Long> getAdminRoles() {
         return adminRoles;
+    }
+
+    public static Map<UUID, String> getSessions() {
+        return sessions;
     }
 }

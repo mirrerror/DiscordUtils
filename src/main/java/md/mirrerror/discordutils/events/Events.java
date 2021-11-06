@@ -8,6 +8,7 @@ import md.mirrerror.discordutils.discord.EmbedManager;
 import md.mirrerror.discordutils.integrations.permissions.PermissionsIntegration;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -30,10 +31,24 @@ public class Events implements Listener {
         Player player = event.getPlayer();
         checkRoles(player);
         if(DiscordUtils.hasTwoFactor(player)) {
-            String code = "" + (ThreadLocalRandom.current().nextLong(899999999)+100000000); // TODO: replace
+            String playerIp = StringUtils.remove(player.getAddress().getAddress().toString(), '/');
+
+            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.2FASessions"))
+                if(BotController.getSessions().containsKey(player.getUniqueId())) if(BotController.getSessions().get(player.getUniqueId()).equals(playerIp)) return;
+
             EmbedManager embedManager = new EmbedManager();
-            DiscordUtils.getDiscordUser(player).openPrivateChannel().complete().sendMessageEmbeds(embedManager.infoEmbed(Message.TWOFACTOR_CODE_MESSAGE.getText().replaceAll("%code%", code))).queue();
-            BotController.getTwoFactorPlayers().put(player, code);
+            if(Main.getTwoFactorType() == Main.TwoFactorType.REACTION) {
+                DiscordUtils.getDiscordUser(player).openPrivateChannel().complete().sendMessageEmbeds(embedManager.infoEmbed(Message.TWOFACTOR_REACTION_MESSAGE.getText().replaceAll("%playerIp%", playerIp))).queue(message -> {
+                    message.addReaction("✅").queue();
+                    message.addReaction("❎").queue();
+                });
+                BotController.getTwoFactorPlayers().put(player, "reaction");
+            }
+            if(Main.getTwoFactorType() == Main.TwoFactorType.CODE) {
+                String code = "" + (ThreadLocalRandom.current().nextLong(899999999)+100000000); // TODO: replace
+                DiscordUtils.getDiscordUser(player).openPrivateChannel().complete().sendMessageEmbeds(embedManager.infoEmbed(Message.TWOFACTOR_CODE_MESSAGE.getText().replaceAll("%code%", code).replaceAll("%playerIp%", playerIp))).queue();
+                BotController.getTwoFactorPlayers().put(player, code);
+            }
         }
     }
 
@@ -73,6 +88,7 @@ public class Events implements Listener {
             if(message.replaceAll(" ", "").equals(BotController.getTwoFactorPlayers().get(player))) {
                 BotController.getTwoFactorPlayers().remove(player);
                 player.sendMessage(Message.TWOFACTOR_AUTHORIZED.getText(true));
+                BotController.getSessions().put(player.getUniqueId(), StringUtils.remove(player.getAddress().getAddress().toString(), '/'));
             } else {
                 Bukkit.getScheduler().runTask(Main.getInstance(), () -> player.kickPlayer(Message.INVALID_TWOFACTOR_CODE.getText()));
             }

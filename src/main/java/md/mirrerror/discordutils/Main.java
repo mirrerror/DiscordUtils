@@ -28,6 +28,7 @@ public final class Main extends JavaPlugin {
 
     private ConfigManager configManager;
     private static PermissionsPlugin permissionsPlugin;
+    private static TwoFactorType twoFactorType;
     private static final int PLUGIN_ID = 13243; // metrics
 
     public enum PermissionsPlugin {
@@ -44,6 +45,10 @@ public final class Main extends JavaPlugin {
         }
     }
 
+    public enum TwoFactorType {
+        CODE, REACTION
+    }
+
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -58,6 +63,7 @@ public final class Main extends JavaPlugin {
         getLogger().info("Commands successfully loaded.");
         Bukkit.getPluginManager().registerEvents(new Events(), this);
         getLogger().info("Events successfully loaded.");
+        setupTwoFactorType();
         setupMetrics();
         getLogger().info("Metrics successfully loaded.");
         if(configManager.getConfig().getBoolean("CheckForUpdates")) {
@@ -98,6 +104,21 @@ public final class Main extends JavaPlugin {
         }));
     }
 
+    private void setupTwoFactorType() {
+        String type = configManager.getConfig().getString("Discord.2FAType").toUpperCase();
+        switch (type) {
+            case "CODE":
+            case "REACTION": {
+                twoFactorType = TwoFactorType.valueOf(type);
+                break;
+            }
+            default: {
+                twoFactorType = TwoFactorType.REACTION;
+                break;
+            }
+        }
+    }
+
     private void registerCommands() {
         CommandManager commandManager = new CommandManager();
         List<SubCommand> subCommands = new ArrayList<>();
@@ -120,4 +141,7 @@ public final class Main extends JavaPlugin {
         return configManager;
     }
 
+    public static TwoFactorType getTwoFactorType() {
+        return twoFactorType;
+    }
 }

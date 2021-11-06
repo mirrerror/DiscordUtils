@@ -4,7 +4,11 @@ import md.mirrerror.discordutils.Main;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+
+import java.util.UUID;
 
 public class DiscordUtils {
 
@@ -21,6 +25,26 @@ public class DiscordUtils {
 
     public static User getDiscordUser(Player player) {
         return BotController.getJda().retrieveUserById(Main.getInstance().getConfigManager().getData().getString("DiscordLink." + player.getUniqueId().toString() + ".userId")).complete();
+    }
+
+    public static OfflinePlayer getOfflinePlayer(User user) {
+        if(isVerified(user)) {
+            for (String s : Main.getInstance().getConfigManager().getData().getConfigurationSection("DiscordLink").getKeys(false)) {
+                if(Long.parseLong(Main.getInstance().getConfigManager().getData().getString("DiscordLink." + s + ".userId")) == user.getIdLong())
+                    return Bukkit.getOfflinePlayer(UUID.fromString(s));
+            }
+        }
+        return null;
+    }
+
+    public static Player getPlayer(User user) {
+        if(isVerified(user)) {
+            for (String s : Main.getInstance().getConfigManager().getData().getConfigurationSection("DiscordLink").getKeys(false)) {
+                if(Long.parseLong(Main.getInstance().getConfigManager().getData().getString("DiscordLink." + s + ".userId")) == user.getIdLong())
+                    return Bukkit.getPlayer(UUID.fromString(s));
+            }
+        }
+        return null;
     }
 
     public static boolean hasTwoFactor(Player player) {
