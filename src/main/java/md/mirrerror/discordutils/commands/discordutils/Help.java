@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 public class Help extends SubCommand {
     @Override
     public void onCommand(CommandSender sender, Command command, String label, String[] args) {
-        Message.sendMessage(sender, Message.HELP);
+        Message.HELP.getStringList().forEach(sender::sendMessage);
     }
 
     @Override

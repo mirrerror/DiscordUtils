@@ -72,7 +72,7 @@ public class Events implements Listener {
             String message = event.getMessage();
             if(message.replaceAll(" ", "").equals(BotController.getTwoFactorPlayers().get(player))) {
                 BotController.getTwoFactorPlayers().remove(player);
-                Message.sendMessage(player, Message.TWOFACTOR_AUTHORIZED, true);
+                player.sendMessage(Message.TWOFACTOR_AUTHORIZED.getText(true));
             } else {
                 Bukkit.getScheduler().runTask(Main.getInstance(), () -> player.kickPlayer(Message.INVALID_TWOFACTOR_CODE.getText()));
             }
@@ -105,7 +105,7 @@ public class Events implements Listener {
         Player player = event.getPlayer();
         if(BotController.getTwoFactorPlayers().containsKey(player)) {
             player.getInventory().addItem(event.getBrokenItem());
-            Message.sendMessage(player, Message.TWOFACTOR_NEEDED, true);
+            player.sendMessage(Message.TWOFACTOR_NEEDED.getText(true));
         }
     }
 
@@ -149,7 +149,7 @@ public class Events implements Listener {
     private void checkTwoFactor(Player player, Cancellable event) {
         if(BotController.getTwoFactorPlayers().containsKey(player)) {
             event.setCancelled(true);
-            Message.sendMessage(player, Message.TWOFACTOR_NEEDED, true);
+            player.sendMessage(Message.TWOFACTOR_NEEDED.getText(true));
         }
     }
 

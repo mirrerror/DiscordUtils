@@ -2,8 +2,6 @@ package md.mirrerror.discordutils.config;
 
 import md.mirrerror.discordutils.Main;
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,35 +61,35 @@ public enum Message {
         return stringList;
     }
 
-    public static void sendMessage(Player player, Message message, boolean addPrefix) {
+/*    public static void sendMessage(Player player, Message message, boolean addPrefix) {
         try {
-            player.sendMessage(message.getText(addPrefix));
+            message.getStringList(addPrefix).forEach(player::sendMessage);
             return;
         } catch (Exception ignored) {}
-        message.getStringList(addPrefix).forEach(player::sendMessage);
+        player.sendMessage(message.getText(addPrefix));
     }
 
     public static void sendMessage(Player player, Message message) {
         try {
-            player.sendMessage(message.getText());
+            message.getStringList().forEach(player::sendMessage);
             return;
         } catch (Exception ignored) {}
-        message.getStringList().forEach(player::sendMessage);
+        player.sendMessage(message.getText());
     }
 
     public static void sendMessage(CommandSender commandSender, Message message, boolean addPrefix) {
         try {
-            commandSender.sendMessage(message.getText(addPrefix));
+            message.getStringList(addPrefix).forEach(commandSender::sendMessage);
             return;
         } catch (Exception ignored) {}
-        message.getStringList(addPrefix).forEach(commandSender::sendMessage);
+        commandSender.sendMessage(message.getText(addPrefix));
     }
 
     public static void sendMessage(CommandSender commandSender, Message message) {
         try {
-            commandSender.sendMessage(message.getText());
+            message.getStringList().forEach(commandSender::sendMessage);
             return;
         } catch (Exception ignored) {}
-        message.getStringList().forEach(commandSender::sendMessage);
-    }
+        commandSender.sendMessage(message.getText());
+    }*/
 }

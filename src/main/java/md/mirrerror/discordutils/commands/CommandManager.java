@@ -30,13 +30,11 @@ public class CommandManager implements CommandExecutor {
                     if(sender.hasPermission(subCommand.getPermission())) {
                         subCommand.onCommand(sender, command, label, newArgs);
                     } else {
-                        Message.sendMessage(sender, Message.INSUFFICIENT_PERMISSIONS, true);
+                        sender.sendMessage(Message.INSUFFICIENT_PERMISSIONS.getText(true));
                     }
                 }
             }
-            if(!hasSubCommand) {
-                Message.sendMessage(sender, Message.UNKNOWN_SUBCOMMAND, true);
-            }
+            if(!hasSubCommand) sender.sendMessage(Message.UNKNOWN_SUBCOMMAND.getText(true));
         }
         return true;
     }

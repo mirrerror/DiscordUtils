@@ -11,7 +11,7 @@ public class Reload extends SubCommand {
     @Override
     public void onCommand(CommandSender sender, Command command, String label, String[] args) {
         Main.getInstance().getConfigManager().reloadConfigFiles();
-        Message.sendMessage(sender, Message.CONFIG_FILES_RELOADED, true);
+        sender.sendMessage(Message.CONFIG_FILES_RELOADED.getText(true));
     }
 
     @Override

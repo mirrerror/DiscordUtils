@@ -13,13 +13,13 @@ public class TwoFactor extends SubCommand {
     @Override
     public void onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(!(sender instanceof Player)) {
-            Message.sendMessage(sender, Message.SENDER_IS_NOT_A_PLAYER, true);
+            sender.sendMessage(Message.SENDER_IS_NOT_A_PLAYER.getText(true));
             return;
         }
 
         Player player = (Player) sender;
         if(!DiscordUtils.isVerified(player)) {
-            Message.sendMessage(player, Message.ACCOUNT_IS_NOT_VERIFIED, true);
+            sender.sendMessage(Message.ACCOUNT_IS_NOT_VERIFIED.getText(true));
             return;
         }
 

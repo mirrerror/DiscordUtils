@@ -14,20 +14,22 @@ public class Link extends SubCommand {
     @Override
     public void onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(!(sender instanceof Player)) {
-            Message.sendMessage(sender, Message.SENDER_IS_NOT_A_PLAYER, true);
+            sender.sendMessage(Message.SENDER_IS_NOT_A_PLAYER.getText(true));
             return;
         }
+
         if(args.length < 1) {
-            Message.sendMessage(sender, Message.DISCORDUTILS_LINK_USAGE, true);
+            sender.sendMessage(Message.DISCORDUTILS_LINK_USAGE.getText(true));
             return;
         }
         Player player = (Player) sender;
         if(DiscordUtils.isVerified(player)) {
-            Message.sendMessage(player, Message.ACCOUNT_ALREADY_VERIFIED, true);
+            sender.sendMessage(Message.ACCOUNT_ALREADY_VERIFIED.getText(true));
             return;
         }
+
         if(!BotController.getLinkCodes().containsKey(args[0])) {
-            Message.sendMessage(player, Message.INVALID_LINK_CODE, true);
+            sender.sendMessage(Message.INVALID_LINK_CODE.getText(true));
             return;
         }
 
@@ -44,7 +46,7 @@ public class Link extends SubCommand {
             }
         }
         BotController.getLinkCodes().remove(args[0]);
-        Message.sendMessage(player, Message.ACCOUNT_SUCCESSFULLY_LINKED, true);
+        sender.sendMessage(Message.ACCOUNT_SUCCESSFULLY_LINKED.getText(true));
     }
 
     @Override
