@@ -5,13 +5,12 @@ import md.mirrerror.discordutils.config.Message;
 import md.mirrerror.discordutils.discord.BotController;
 import md.mirrerror.discordutils.discord.DiscordUtils;
 import md.mirrerror.discordutils.discord.EmbedManager;
-import md.mirrerror.discordutils.integrations.permissions.LuckPermsIntegration;
 import md.mirrerror.discordutils.integrations.permissions.PermissionsIntegration;
-import md.mirrerror.discordutils.integrations.permissions.VaultIntegration;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -26,16 +25,12 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Events implements Listener {
 
-    public Events() {
-        Bukkit.getPluginManager().registerEvents(this, Main.getInstance());
-    }
-
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         checkRoles(player);
         if(DiscordUtils.hasTwoFactor(player)) {
-            String code = "" + (ThreadLocalRandom.current().nextLong(899999999)+100000000);
+            String code = "" + (ThreadLocalRandom.current().nextLong(899999999)+100000000); // TODO: replace
             EmbedManager embedManager = new EmbedManager();
             DiscordUtils.getDiscordUser(player).openPrivateChannel().complete().sendMessageEmbeds(embedManager.infoEmbed(Message.TWOFACTOR_CODE_MESSAGE.getText().replaceAll("%code%", code))).queue();
             BotController.getTwoFactorPlayers().put(player, code);
@@ -51,38 +46,22 @@ public class Events implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        if(BotController.getTwoFactorPlayers().containsKey(player)) {
-            event.setCancelled(true);
-            player.sendMessage(Message.TWOFACTOR_NEEDED.getText(true));
-        }
+        checkTwoFactor(event.getPlayer(), event);
     }
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-        if(BotController.getTwoFactorPlayers().containsKey(player)) {
-            event.setCancelled(true);
-            player.sendMessage(Message.TWOFACTOR_NEEDED.getText(true));
-        }
+        checkTwoFactor(event.getPlayer(), event);
     }
 
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
-        Player player = event.getPlayer();
-        if(BotController.getTwoFactorPlayers().containsKey(player)) {
-            event.setCancelled(true);
-            player.sendMessage(Message.TWOFACTOR_NEEDED.getText(true));
-        }
+        checkTwoFactor(event.getPlayer(), event);
     }
 
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent event) {
-        Player player = event.getPlayer();
-        if(BotController.getTwoFactorPlayers().containsKey(player)) {
-            event.setCancelled(true);
-            player.sendMessage(Message.TWOFACTOR_NEEDED.getText(true));
-        }
+        checkTwoFactor(event.getPlayer(), event);
     }
 
     @EventHandler
@@ -93,7 +72,7 @@ public class Events implements Listener {
             String message = event.getMessage();
             if(message.replaceAll(" ", "").equals(BotController.getTwoFactorPlayers().get(player))) {
                 BotController.getTwoFactorPlayers().remove(player);
-                player.sendMessage(Message.TWOFACTOR_AUTHORIZED.getText(true));
+                Message.sendMessage(player, Message.TWOFACTOR_AUTHORIZED, true);
             } else {
                 Bukkit.getScheduler().runTask(Main.getInstance(), () -> player.kickPlayer(Message.INVALID_TWOFACTOR_CODE.getText()));
             }
@@ -103,38 +82,22 @@ public class Events implements Listener {
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
         if(!(event.getEntity() instanceof Player)) return;
-        Player player = (Player) event.getEntity();
-        if(BotController.getTwoFactorPlayers().containsKey(player)) {
-            event.setCancelled(true);
-            player.sendMessage(Message.TWOFACTOR_NEEDED.getText(true));
-        }
+        checkTwoFactor((Player) event.getEntity(), event);
     }
 
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
-        Player player = event.getPlayer();
-        if(BotController.getTwoFactorPlayers().containsKey(player)) {
-            event.setCancelled(true);
-            player.sendMessage(Message.TWOFACTOR_NEEDED.getText(true));
-        }
+        checkTwoFactor(event.getPlayer(), event);
     }
 
     @EventHandler
     public void onPlace(BlockPlaceEvent event) {
-        Player player = event.getPlayer();
-        if(BotController.getTwoFactorPlayers().containsKey(player)) {
-            event.setCancelled(true);
-            player.sendMessage(Message.TWOFACTOR_NEEDED.getText(true));
-        }
+        checkTwoFactor(event.getPlayer(), event);
     }
 
     @EventHandler
     public void onConsume(PlayerItemConsumeEvent event) {
-        Player player = event.getPlayer();
-        if(BotController.getTwoFactorPlayers().containsKey(player)) {
-            event.setCancelled(true);
-            player.sendMessage(Message.TWOFACTOR_NEEDED.getText(true));
-        }
+        checkTwoFactor(event.getPlayer(), event);
     }
 
     @EventHandler
@@ -142,35 +105,23 @@ public class Events implements Listener {
         Player player = event.getPlayer();
         if(BotController.getTwoFactorPlayers().containsKey(player)) {
             player.getInventory().addItem(event.getBrokenItem());
-            player.sendMessage(Message.TWOFACTOR_NEEDED.getText(true));
+            Message.sendMessage(player, Message.TWOFACTOR_NEEDED, true);
         }
     }
 
     @EventHandler
     public void onDamageItem(PlayerItemDamageEvent event) {
-        Player player = event.getPlayer();
-        if(BotController.getTwoFactorPlayers().containsKey(player)) {
-            event.getItem().setDurability((short) (event.getItem().getDurability()-event.getDamage()));
-            player.sendMessage(Message.TWOFACTOR_NEEDED.getText(true));
-        }
+        checkTwoFactor(event.getPlayer(), event);
     }
 
     @EventHandler
     public void onHeldItem(PlayerItemHeldEvent event) {
-        Player player = event.getPlayer();
-        if(BotController.getTwoFactorPlayers().containsKey(player)) {
-            event.setCancelled(true);
-            player.sendMessage(Message.TWOFACTOR_NEEDED.getText(true));
-        }
+        checkTwoFactor(event.getPlayer(), event);
     }
 
     @EventHandler
     public void onClick(InventoryClickEvent event) {
-        Player player = (Player) event.getWhoClicked();
-        if(BotController.getTwoFactorPlayers().containsKey(player)) {
-            event.setCancelled(true);
-            player.sendMessage(Message.TWOFACTOR_NEEDED.getText(true));
-        }
+        checkTwoFactor((Player) event.getWhoClicked(), event);
     }
 
     private void checkRoles(Player player) {
@@ -192,6 +143,13 @@ public class Events implements Listener {
                     });
                 }});
             }
+        }
+    }
+
+    private void checkTwoFactor(Player player, Cancellable event) {
+        if(BotController.getTwoFactorPlayers().containsKey(player)) {
+            event.setCancelled(true);
+            Message.sendMessage(player, Message.TWOFACTOR_NEEDED, true);
         }
     }
 

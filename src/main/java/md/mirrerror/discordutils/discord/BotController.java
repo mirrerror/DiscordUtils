@@ -4,6 +4,7 @@ import md.mirrerror.discordutils.Main;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.User;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import javax.security.auth.login.LoginException;
@@ -23,14 +24,17 @@ public class BotController {
     private static Map<Player, String> twoFactorPlayers = new HashMap<>();
 
     public static void setupBot(String token) {
-        try {
-            jda = JDABuilder.createDefault(token).build();
-            jda.addEventListener(new EventListener());
-            setupGroupRoles();
-            setupAdminRoles();
-        } catch (LoginException e) {
-            e.printStackTrace();
-        }
+        Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
+            try {
+                jda = JDABuilder.createDefault(token).build();
+                jda.addEventListener(new EventListener());
+                setupGroupRoles();
+                setupAdminRoles();
+                Main.getInstance().getLogger().info("Bot successfully loaded.");
+            } catch (LoginException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public static void setupGroupRoles() {

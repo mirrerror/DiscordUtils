@@ -1,6 +1,8 @@
 # Плагин на пермишены, использующийся вами (оставьте пустым, если хотите отключить интеграцию)
 # Доступные на данный момент плагины: LuckPerms, Vault (включает в себя поддержку множества плагинов, список: https://www.spigotmc.org/resources/vault.34315/)
 PermissionsPlugin: 'LuckPerms'
+# Проверка на наличие неустановленных обновлений плагина
+CheckForUpdates: true
 Discord:
   # Токен, необходимый для работы бота. Получить его можно здесь: https://discord.com/developers/applications
   BotToken: ''

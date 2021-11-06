@@ -79,10 +79,6 @@ public class ConfigManager {
         } catch (IOException | InvalidConfigurationException e) {
             e.printStackTrace();
         }
-        /*initializeConfigFiles();
-        BotController.setupAdminRoles();
-        BotController.setupGroupRoles();
-        Main.getInstance().getLogger().info("Successfully reloaded the config files.");*/
     }
 
     public FileConfiguration getConfig() {

@@ -2,6 +2,7 @@ package md.mirrerror.discordutils;
 
 import md.mirrerror.discordutils.commands.CommandManager;
 import md.mirrerror.discordutils.commands.SubCommand;
+import md.mirrerror.discordutils.commands.discordutils.Help;
 import md.mirrerror.discordutils.commands.discordutils.Link;
 import md.mirrerror.discordutils.commands.discordutils.Reload;
 import md.mirrerror.discordutils.commands.discordutils.TwoFactor;
@@ -50,18 +51,19 @@ public final class Main extends JavaPlugin {
         configManager = new ConfigManager();
         getLogger().info("Configuration files successfully loaded.");
         BotController.setupBot(configManager.getConfig().getString("Discord.BotToken"));
-        getLogger().info("Bot successfully loaded.");
         checkOutForPermissionsPlugin();
         if(!permissionsPlugin.name().equals("NONE")) getLogger().info("Successfully integrated with " + permissionsPlugin.name() + ".");
         else getLogger().info("You chose no permission plugin or it is not supported. Disabling this feature.");
         registerCommands();
         getLogger().info("Commands successfully loaded.");
-        new Events();
+        Bukkit.getPluginManager().registerEvents(new Events(), this);
         getLogger().info("Events successfully loaded.");
         setupMetrics();
         getLogger().info("Metrics successfully loaded.");
-        getLogger().info("Checking for updates...");
-        UpdateChecker.checkForUpdates();
+        if(configManager.getConfig().getBoolean("CheckForUpdates")) {
+            getLogger().info("Checking for updates...");
+            UpdateChecker.checkForUpdates();
+        }
     }
 
     @Override
@@ -102,6 +104,7 @@ public final class Main extends JavaPlugin {
         subCommands.add(new Link());
         subCommands.add(new Reload());
         subCommands.add(new TwoFactor());
+        subCommands.add(new Help());
         commandManager.registerCommand("discordutils", subCommands);
     }
 

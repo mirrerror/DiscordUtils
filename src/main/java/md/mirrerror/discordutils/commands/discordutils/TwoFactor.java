@@ -12,23 +12,25 @@ public class TwoFactor extends SubCommand {
 
     @Override
     public void onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(sender instanceof Player) {
-            Player player = (Player) sender;
-            if(DiscordUtils.isVerified(player)) {
-                if(DiscordUtils.hasTwoFactor(player)) {
-                    Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".2factor", false);
-                    sender.sendMessage(Message.DISCORDUTILS_TWOFACTOR_SUCCESSFUL.getText(true) + Message.DISABLED.getText());
-                } else {
-                    Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".2factor", true);
-                    sender.sendMessage(Message.DISCORDUTILS_TWOFACTOR_SUCCESSFUL.getText(true) + Message.ENABLED.getText());
-                }
-                Main.getInstance().getConfigManager().saveConfigFiles();
-            } else {
-                sender.sendMessage(Message.ACCOUNT_IS_NOT_VERIFIED.getText(true));
-            }
-        } else {
-            sender.sendMessage(Message.SENDER_IS_NOT_A_PLAYER.getText(true));
+        if(!(sender instanceof Player)) {
+            Message.sendMessage(sender, Message.SENDER_IS_NOT_A_PLAYER, true);
+            return;
         }
+
+        Player player = (Player) sender;
+        if(!DiscordUtils.isVerified(player)) {
+            Message.sendMessage(player, Message.ACCOUNT_IS_NOT_VERIFIED, true);
+            return;
+        }
+
+        if(DiscordUtils.hasTwoFactor(player)) {
+            Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".2factor", false);
+            sender.sendMessage(Message.DISCORDUTILS_TWOFACTOR_SUCCESSFUL.getText(true) + Message.DISABLED.getText());
+        } else {
+            Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".2factor", true);
+            sender.sendMessage(Message.DISCORDUTILS_TWOFACTOR_SUCCESSFUL.getText(true) + Message.ENABLED.getText());
+        }
+        Main.getInstance().getConfigManager().saveConfigFiles();
     }
 
     @Override

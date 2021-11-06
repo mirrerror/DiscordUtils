@@ -1,6 +1,7 @@
 package md.mirrerror.discordutils.utils;
 
 import md.mirrerror.discordutils.Main;
+import org.bukkit.Bukkit;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,24 +12,26 @@ import java.net.URLConnection;
 public class UpdateChecker {
 
     public static void checkForUpdates() {
-        try {
-            URL url = new URL("https://raw.githubusercontent.com/mirrerror/DiscordUtils/main/version.txt");
-            URLConnection connection = url.openConnection();
-            connection.setConnectTimeout(1200);
-            connection.setReadTimeout(1200);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String version = Main.getInstance().getDescription().getVersion();
-            String latestVersion = bufferedReader.readLine().trim();
-            if(!latestVersion.equalsIgnoreCase(version)) {
-                Main.getInstance().getLogger().info("There is a new plugin version available! Make sure to update!");
-                Main.getInstance().getLogger().info("Your version: " + version + "; latest version: " + latestVersion + ".");
-                Main.getInstance().getLogger().info("Link: http://rubukkit.org/threads/misc-discordutils-v1-0-discord-bot-dlja-servera-minecraft-1-7.179479/");
-            } else {
-                Main.getInstance().getLogger().info("You're up to date.");
+        Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
+            try {
+                URL url = new URL("https://raw.githubusercontent.com/mirrerror/DiscordUtils/main/version.txt");
+                URLConnection connection = url.openConnection();
+                connection.setConnectTimeout(1200);
+                connection.setReadTimeout(1200);
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String version = Main.getInstance().getDescription().getVersion();
+                String latestVersion = bufferedReader.readLine().trim();
+                if(!latestVersion.equalsIgnoreCase(version)) {
+                    Main.getInstance().getLogger().info("There is a new plugin version available! Make sure to update!");
+                    Main.getInstance().getLogger().info("Your version: " + version + "; latest version: " + latestVersion + ".");
+                    Main.getInstance().getLogger().info("Link: http://rubukkit.org/threads/misc-discordutils-v1-0-discord-bot-dlja-servera-minecraft-1-7.179479/");
+                } else {
+                    Main.getInstance().getLogger().info("You're up to date.");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        });
     }
 
 }
