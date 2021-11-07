@@ -32,16 +32,14 @@ public final class Main extends JavaPlugin {
     private static final int PLUGIN_ID = 13243; // metrics
 
     public enum PermissionsPlugin {
-        NONE(null), LUCK_PERMS(new LuckPermsIntegration()), VAULT(new VaultIntegration());
-
-        private PermissionsIntegration permissionsIntegration;
-
-        PermissionsPlugin(PermissionsIntegration permissionsIntegration) {
-            this.permissionsIntegration = permissionsIntegration;
-        }
+        NONE, LUCK_PERMS, VAULT;
 
         public PermissionsIntegration getPermissionsIntegration() {
-            return permissionsIntegration;
+            switch (this) {
+                case LUCK_PERMS: return new LuckPermsIntegration();
+                case VAULT: return new VaultIntegration();
+                default: return null;
+            }
         }
     }
 
@@ -78,12 +76,12 @@ public final class Main extends JavaPlugin {
     }
 
     private void checkOutForPermissionsPlugin() {
-        switch(configManager.getConfig().getString("PermissionsPlugin")) {
-            case "LuckPerms": {
+        switch(configManager.getConfig().getString("PermissionsPlugin").toUpperCase()) {
+            case "LUCKPERMS": {
                 permissionsPlugin = PermissionsPlugin.LUCK_PERMS;
                 break;
             }
-            case "Vault": {
+            case "VAULT": {
                 permissionsPlugin = PermissionsPlugin.VAULT;
                 break;
             }
