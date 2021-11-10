@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.security.SecureRandom;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -31,14 +32,16 @@ public class EventListener extends ListenerAdapter {
                     event.getChannel().sendMessageEmbeds(embedManager.errorEmbed(Message.LINK_ALREADY_INITIATED.getText())).queue();
                     return;
                 }
-                String code = UUID.randomUUID().toString().replaceAll("-", "");
+                String code = "";
+                byte[] secureRandomSeed = new SecureRandom().generateSeed(20);
+                for(byte b : secureRandomSeed) code += b;
                 BotController.getLinkCodes().put(code, event.getAuthor());
                 event.getChannel().sendMessageEmbeds(embedManager.successfulEmbed(Message.VERIFICATION_MESSAGE.getText())).queue();
-                event.getAuthor().openPrivateChannel().complete().sendMessageEmbeds(embedManager.infoEmbed(Message.VERIFICATION_CODE_MESSAGE.getText().replaceAll("%code%", code))).queue();
+                event.getAuthor().openPrivateChannel().complete().sendMessageEmbeds(embedManager.infoEmbed(Message.VERIFICATION_CODE_MESSAGE.getText().replace("%code%", code))).queue();
                 break;
             }
             case "online": {
-                event.getChannel().sendMessageEmbeds(embedManager.infoEmbed(Message.ONLINE.getText().replaceAll("%online%", "" + Bukkit.getOnlinePlayers().size()))).queue();
+                event.getChannel().sendMessageEmbeds(embedManager.infoEmbed(Message.ONLINE.getText().replace("%online%", "" + Bukkit.getOnlinePlayers().size()))).queue();
                 break;
             }
             case "sudo": {

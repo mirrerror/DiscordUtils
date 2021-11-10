@@ -20,6 +20,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -38,15 +39,17 @@ public class Events implements Listener {
 
             EmbedManager embedManager = new EmbedManager();
             if(Main.getTwoFactorType() == Main.TwoFactorType.REACTION) {
-                DiscordUtils.getDiscordUser(player).openPrivateChannel().complete().sendMessageEmbeds(embedManager.infoEmbed(Message.TWOFACTOR_REACTION_MESSAGE.getText().replaceAll("%playerIp%", playerIp))).queue(message -> {
+                DiscordUtils.getDiscordUser(player).openPrivateChannel().complete().sendMessageEmbeds(embedManager.infoEmbed(Message.TWOFACTOR_REACTION_MESSAGE.getText().replace("%playerIp%", playerIp))).queue(message -> {
                     message.addReaction("✅").queue();
                     message.addReaction("❎").queue();
                 });
                 BotController.getTwoFactorPlayers().put(player, "reaction");
             }
             if(Main.getTwoFactorType() == Main.TwoFactorType.CODE) {
-                String code = "" + (ThreadLocalRandom.current().nextLong(899999999)+100000000); // TODO: replace
-                DiscordUtils.getDiscordUser(player).openPrivateChannel().complete().sendMessageEmbeds(embedManager.infoEmbed(Message.TWOFACTOR_CODE_MESSAGE.getText().replaceAll("%code%", code).replaceAll("%playerIp%", playerIp))).queue();
+                String code = "";
+                byte[] secureRandomSeed = new SecureRandom().generateSeed(20);
+                for(byte b : secureRandomSeed) code += b;
+                DiscordUtils.getDiscordUser(player).openPrivateChannel().complete().sendMessageEmbeds(embedManager.infoEmbed(Message.TWOFACTOR_CODE_MESSAGE.getText().replace("%code%", code).replace("%playerIp%", playerIp))).queue();
                 BotController.getTwoFactorPlayers().put(player, code);
             }
         }
@@ -85,7 +88,7 @@ public class Events implements Listener {
         if(BotController.getTwoFactorPlayers().containsKey(player)) {
             event.setCancelled(true);
             String message = event.getMessage();
-            if(message.replaceAll(" ", "").equals(BotController.getTwoFactorPlayers().get(player))) {
+            if(message.replace(" ", "").equals(BotController.getTwoFactorPlayers().get(player))) {
                 BotController.getTwoFactorPlayers().remove(player);
                 player.sendMessage(Message.TWOFACTOR_AUTHORIZED.getText(true));
                 BotController.getSessions().put(player.getUniqueId(), StringUtils.remove(player.getAddress().getAddress().toString(), '/'));

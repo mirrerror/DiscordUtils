@@ -16,7 +16,7 @@ public class CommandManager implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(commands.containsKey(command.getName()) && commands.get(command.getName()) != null) {
+        if(commands.get(command.getName()) != null) {
             int newLength = 0;
             if(args.length >= 1) newLength = args.length-1;
             String[] newArgs = new String[newLength];
