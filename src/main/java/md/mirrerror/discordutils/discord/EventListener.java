@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.security.SecureRandom;
 import java.util.Objects;
-import java.util.UUID;
 
 public class EventListener extends ListenerAdapter {
 
