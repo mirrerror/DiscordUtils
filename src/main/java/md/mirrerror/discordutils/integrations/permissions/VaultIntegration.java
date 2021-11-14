@@ -2,6 +2,7 @@ package md.mirrerror.discordutils.integrations.permissions;
 
 import md.mirrerror.discordutils.Main;
 import net.milkbowl.vault.permission.Permission;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
@@ -24,6 +25,11 @@ public class VaultIntegration implements PermissionsIntegration {
     @Override
     public List<String> getUserGroups(Player player) {
         return new ArrayList<>(Arrays.asList(perms.getPlayerGroups(player)));
+    }
+
+    @Override
+    public List<String> getUserGroups(OfflinePlayer offlinePlayer) {
+        return new ArrayList<>(Arrays.asList(perms.getPlayerGroups(null, offlinePlayer)));
     }
 
     public boolean setupPermissions() {

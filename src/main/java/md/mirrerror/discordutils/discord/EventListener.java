@@ -2,6 +2,9 @@ package md.mirrerror.discordutils.discord;
 
 import md.mirrerror.discordutils.Main;
 import md.mirrerror.discordutils.config.Message;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -11,6 +14,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.security.SecureRandom;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class EventListener extends ListenerAdapter {
@@ -34,6 +39,7 @@ public class EventListener extends ListenerAdapter {
                 String code = "";
                 byte[] secureRandomSeed = new SecureRandom().generateSeed(20);
                 for(byte b : secureRandomSeed) code += b;
+                code = code.replace("-", "");
                 BotController.getLinkCodes().put(code, event.getAuthor());
                 event.getChannel().sendMessageEmbeds(embedManager.successfulEmbed(Message.VERIFICATION_MESSAGE.getText())).queue();
                 event.getAuthor().openPrivateChannel().complete().sendMessageEmbeds(embedManager.infoEmbed(Message.VERIFICATION_CODE_MESSAGE.getText().replace("%code%", code))).queue();
@@ -77,6 +83,33 @@ public class EventListener extends ListenerAdapter {
                 Bukkit.getScheduler().runTask(Main.getInstance(), () -> player.kickPlayer(Message.TWOFACTOR_REJECTED.getText()));
             }
             event.getChannel().deleteMessageById(event.getMessageId()).queue();
+        }
+    }
+
+    @Override
+    public void onGuildVoiceJoin(@NotNull GuildVoiceJoinEvent event) {
+        if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.GuildVoiceRewards.Enabled")) {
+            if(BotController.getRewardBlacklistedVoiceChannels().contains(event.getChannelJoined().getIdLong())) return;
+            User user = event.getEntity().getUser();
+            if(!DiscordUtils.isVerified(user)) return;
+            LocalDateTime localDateTime = LocalDateTime.now();
+            BotController.getVoiceTime().put(user, localDateTime);
+        }
+    }
+
+    @Override
+    public void onGuildVoiceLeave(@NotNull GuildVoiceLeaveEvent event) {
+        if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.GuildVoiceRewards.Enabled")) {
+            if(BotController.getRewardBlacklistedVoiceChannels().contains(event.getChannelLeft().getIdLong())) return;
+            User user = event.getEntity().getUser();
+            if(!DiscordUtils.isVerified(user)) return;
+            if(!BotController.getVoiceTime().containsKey(user)) return;
+            LocalDateTime localDateTime = LocalDateTime.now();
+            long difference = Duration.between(BotController.getVoiceTime().get(user), localDateTime).getSeconds();
+            long multiplier = Math.round(Main.getInstance().getConfigManager().getConfig().getDouble("Discord.GuildVoiceRewards.Time")/difference);
+            BotController.getVoiceTime().remove(user);
+            for (long i = 0; i < multiplier; i++) Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                    Main.getInstance().getConfigManager().getConfig().getString("Discord.GuildVoiceRewards.Reward").replace("%player%", DiscordUtils.getOfflinePlayer(user).getName()));
         }
     }
 

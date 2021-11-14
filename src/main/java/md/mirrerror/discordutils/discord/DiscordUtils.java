@@ -1,6 +1,7 @@
 package md.mirrerror.discordutils.discord;
 
 import md.mirrerror.discordutils.Main;
+import md.mirrerror.discordutils.integrations.permissions.PermissionsIntegration;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -8,12 +9,18 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class DiscordUtils {
 
     public static boolean isVerified(Player player) {
         return Main.getInstance().getConfigManager().getData().getConfigurationSection("DiscordLink").contains(player.getUniqueId().toString());
+    }
+
+    public static boolean isVerified(OfflinePlayer offlinePlayer) {
+        return Main.getInstance().getConfigManager().getData().getConfigurationSection("DiscordLink").contains(offlinePlayer.getUniqueId().toString());
     }
 
     public static boolean isVerified(User user) {
@@ -25,6 +32,10 @@ public class DiscordUtils {
 
     public static User getDiscordUser(Player player) {
         return BotController.getJda().retrieveUserById(Main.getInstance().getConfigManager().getData().getString("DiscordLink." + player.getUniqueId().toString() + ".userId")).complete();
+    }
+
+    public static User getDiscordUser(OfflinePlayer offlinePlayer) {
+        return BotController.getJda().retrieveUserById(Main.getInstance().getConfigManager().getData().getString("DiscordLink." + offlinePlayer.getUniqueId().toString() + ".userId")).complete();
     }
 
     public static OfflinePlayer getOfflinePlayer(User user) {
@@ -81,6 +92,55 @@ public class DiscordUtils {
         long roleId = Main.getInstance().getConfigManager().getConfig().getLong("Discord.VerifiedRole.Id");
         if(roleId > 0) return guild.getRoleById(roleId);
         return null;
+    }
+
+    public static void checkRoles(OfflinePlayer offlinePlayer) {
+        if(!DiscordUtils.isVerified(offlinePlayer)) return;
+        PermissionsIntegration permissionsIntegration = Main.getPermissionsPlugin().getPermissionsIntegration();
+        if(permissionsIntegration == null) return;
+        List<String> groups = permissionsIntegration.getUserGroups(offlinePlayer);
+        Map<Long, String> groupRoles = BotController.getGroupRoles();
+        /*for(String s : groups) {
+            if(groupRoles.containsValue(s)) {
+                groupRoles.forEach((groupId, group) -> { if(group.equals(s)) {
+                    Role role = BotController.getJda().getRoleById(groupId);
+                    BotController.getJda().getGuilds().forEach(guild -> {
+                        if(DiscordUtils.isVerified(player)) {
+                            User user = DiscordUtils.getDiscordUser(player);
+                            if(guild.retrieveMember(user).complete() != null) {
+                                if(role != null) guild.addRoleToMember(guild.retrieveMember(user).complete(), role).queue();
+                            }
+                        }
+                    });
+                }});
+            }
+        }*/
+        for(Long roleId : groupRoles.keySet()) {
+            String group = groupRoles.get(roleId);
+            Role role = BotController.getJda().getRoleById(roleId);
+            if(groups.contains(group)) {
+                BotController.getJda().getGuilds().forEach(guild -> {
+                    User user = DiscordUtils.getDiscordUser(offlinePlayer);
+                    if(guild.retrieveMember(user).complete() != null) {
+                        if(role != null) guild.addRoleToMember(guild.retrieveMember(user).complete(), role).queue();
+                    }
+                });
+            } else {
+                BotController.getJda().getGuilds().forEach(guild -> {
+                    User user = DiscordUtils.getDiscordUser(offlinePlayer);
+                    if(guild.retrieveMember(user).complete() != null) {
+                        if(role != null) guild.removeRoleFromMember(guild.retrieveMember(user).complete(), role).queue();
+                    }
+                });
+            }
+        }
+    }
+
+    public static void setupDelayedRolesCheck() {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(Main.getInstance(), () -> Main.getInstance().getConfigManager().getData().getConfigurationSection("DiscordLink").getKeys(false)
+                .forEach(verified -> checkRoles(Bukkit.getOfflinePlayer(UUID.fromString(verified)))),
+                0L, Main.getInstance().getConfigManager().getConfig().getInt("Discord.DelayedRolesCheck.Delay")*20L);
+        Main.getInstance().getLogger().info("Delayed roles check has been successfully enabled.");
     }
 
 }

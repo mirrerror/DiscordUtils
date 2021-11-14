@@ -5,9 +5,6 @@ import md.mirrerror.discordutils.config.Message;
 import md.mirrerror.discordutils.discord.BotController;
 import md.mirrerror.discordutils.discord.DiscordUtils;
 import md.mirrerror.discordutils.discord.EmbedManager;
-import md.mirrerror.discordutils.integrations.permissions.PermissionsIntegration;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -21,15 +18,13 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 
 import java.security.SecureRandom;
-import java.util.List;
-import java.util.Map;
 
 public class Events implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        checkRoles(player);
+        DiscordUtils.checkRoles(player);
         if(DiscordUtils.hasTwoFactor(player)) {
             String playerIp = StringUtils.remove(player.getAddress().getAddress().toString(), '/');
 
@@ -48,6 +43,7 @@ public class Events implements Listener {
                 String code = "";
                 byte[] secureRandomSeed = new SecureRandom().generateSeed(20);
                 for(byte b : secureRandomSeed) code += b;
+                code = code.replace("-", "");
                 DiscordUtils.getDiscordUser(player).openPrivateChannel().complete().sendMessageEmbeds(embedManager.infoEmbed(Message.TWOFACTOR_CODE_MESSAGE.getText().replace("%code%", code).replace("%playerIp%", playerIp))).queue();
                 BotController.getTwoFactorPlayers().put(player, code);
             }
@@ -57,7 +53,7 @@ public class Events implements Listener {
     @EventHandler
     public void onDisconnect(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        checkRoles(player);
+        DiscordUtils.checkRoles(player);
         BotController.getTwoFactorPlayers().remove(player);
     }
 
@@ -140,28 +136,6 @@ public class Events implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         checkTwoFactor((Player) event.getWhoClicked(), event);
-    }
-
-    private void checkRoles(Player player) {
-        PermissionsIntegration permissionsIntegration = Main.getPermissionsPlugin().getPermissionsIntegration();
-        if(permissionsIntegration == null) return;
-        List<String> groups = permissionsIntegration.getUserGroups(player);
-        Map<Long, String> groupRoles = BotController.getGroupRoles();
-        for(String s : groups) {
-            if(groupRoles.containsValue(s)) {
-                groupRoles.forEach((groupId, group) -> { if(group.equals(s)) {
-                    Role role = BotController.getJda().getRoleById(groupId);
-                    BotController.getJda().getGuilds().forEach(guild -> {
-                        if(DiscordUtils.isVerified(player)) {
-                            User user = DiscordUtils.getDiscordUser(player);
-                            if(guild.retrieveMember(user).complete() != null) {
-                                if(role != null) guild.addRoleToMember(guild.retrieveMember(user).complete(), role).queue();
-                            }
-                        }
-                    });
-                }});
-            }
-        }
     }
 
     private void checkTwoFactor(Player player, Cancellable event) {

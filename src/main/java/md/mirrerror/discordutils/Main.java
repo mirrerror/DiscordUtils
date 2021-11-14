@@ -8,6 +8,7 @@ import md.mirrerror.discordutils.commands.discordutils.Reload;
 import md.mirrerror.discordutils.commands.discordutils.TwoFactor;
 import md.mirrerror.discordutils.config.ConfigManager;
 import md.mirrerror.discordutils.discord.BotController;
+import md.mirrerror.discordutils.discord.DiscordUtils;
 import md.mirrerror.discordutils.events.Events;
 import md.mirrerror.discordutils.integrations.permissions.LuckPermsIntegration;
 import md.mirrerror.discordutils.integrations.permissions.PermissionsIntegration;
