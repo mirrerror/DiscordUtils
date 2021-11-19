@@ -76,6 +76,10 @@ public class EventListener extends ListenerAdapter {
                 break;
             }
             case "embed": {
+                if(!DiscordUtils.isAdmin(event.getAuthor())) {
+                    event.getChannel().sendMessageEmbeds(embedManager.errorEmbed(Message.INSUFFICIENT_PERMISSIONS.getText())).queue();
+                    return;
+                }
                 if(args.length < 4) {
                     event.getChannel().sendMessageEmbeds(embedManager.infoEmbed(Message.DISCORD_EMBED_USAGE.getText())).queue();
                     return;
