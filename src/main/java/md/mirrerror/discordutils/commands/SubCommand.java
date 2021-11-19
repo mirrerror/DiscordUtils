@@ -3,10 +3,10 @@ package md.mirrerror.discordutils.commands;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-public abstract class SubCommand {
+public interface SubCommand {
 
-    public abstract void onCommand(CommandSender sender, Command command, String label, String[] args);
-    public abstract String getName();
-    public abstract String getPermission();
+    void onCommand(CommandSender sender, Command command, String label, String[] args);
+    String getName();
+    String getPermission();
 
 }

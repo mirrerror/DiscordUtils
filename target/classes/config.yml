@@ -41,6 +41,11 @@
 # Time - минимальное время для получения награды
 # Reward - команда, выдающаяся при достижении минимального времени (выполняется несколько раз, если минимальное время отыграно несколько раз)
 # BlacklistedChannels - ID игнорирующихся каналов. Пример: BlacklistedChannels: [905508941230915684, 123123123131231233]
+#
+# MessagesChannel
+# Включить ли отправку сообщений из игры в Discord (/du sendtodiscord)
+# Enabled - true - включить, false - выключить
+# Id - ID канала, в который будут отправляться сообщения
 
 PermissionsPlugin: 'LuckPerms'
 CheckForUpdates: true
@@ -62,3 +67,6 @@ Discord:
     Time: 600
     Reward: 'eco give %player% 100'
     BlacklistedChannels: []
+  MessagesChannel:
+    Enabled: true
+    Id: -1

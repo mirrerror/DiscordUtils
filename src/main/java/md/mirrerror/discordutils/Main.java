@@ -2,13 +2,9 @@ package md.mirrerror.discordutils;
 
 import md.mirrerror.discordutils.commands.CommandManager;
 import md.mirrerror.discordutils.commands.SubCommand;
-import md.mirrerror.discordutils.commands.discordutils.Help;
-import md.mirrerror.discordutils.commands.discordutils.Link;
-import md.mirrerror.discordutils.commands.discordutils.Reload;
-import md.mirrerror.discordutils.commands.discordutils.TwoFactor;
+import md.mirrerror.discordutils.commands.discordutils.*;
 import md.mirrerror.discordutils.config.ConfigManager;
 import md.mirrerror.discordutils.discord.BotController;
-import md.mirrerror.discordutils.discord.DiscordUtils;
 import md.mirrerror.discordutils.events.Events;
 import md.mirrerror.discordutils.integrations.permissions.LuckPermsIntegration;
 import md.mirrerror.discordutils.integrations.permissions.PermissionsIntegration;
@@ -74,6 +70,8 @@ public final class Main extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        BotController.getJda().cancelRequests();
+        BotController.getJda().shutdown();
     }
 
     private void checkOutForPermissionsPlugin() {
@@ -125,6 +123,7 @@ public final class Main extends JavaPlugin {
         subCommands.add(new Reload());
         subCommands.add(new TwoFactor());
         subCommands.add(new Help());
+        subCommands.add(new SendToDiscord());
         commandManager.registerCommand("discordutils", subCommands);
     }
 

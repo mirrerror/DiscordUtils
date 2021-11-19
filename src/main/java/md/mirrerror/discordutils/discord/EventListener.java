@@ -13,10 +13,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
+import java.lang.reflect.Field;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 public class EventListener extends ListenerAdapter {
 
@@ -40,9 +41,18 @@ public class EventListener extends ListenerAdapter {
                 byte[] secureRandomSeed = new SecureRandom().generateSeed(20);
                 for(byte b : secureRandomSeed) code += b;
                 code = code.replace("-", "");
-                BotController.getLinkCodes().put(code, event.getAuthor());
-                event.getChannel().sendMessageEmbeds(embedManager.successfulEmbed(Message.VERIFICATION_MESSAGE.getText())).queue();
-                event.getAuthor().openPrivateChannel().complete().sendMessageEmbeds(embedManager.infoEmbed(Message.VERIFICATION_CODE_MESSAGE.getText().replace("%code%", code))).queue();
+
+                final String FINAL_CODE = code;
+                event.getAuthor().openPrivateChannel().submit()
+                        .thenCompose(channel -> channel.sendMessageEmbeds(embedManager.infoEmbed(Message.VERIFICATION_CODE_MESSAGE.getText().replace("%code%", FINAL_CODE))).submit())
+                        .whenComplete((msg, error) -> {
+                            if(error == null) {
+                                event.getChannel().sendMessageEmbeds(embedManager.successfulEmbed(Message.VERIFICATION_MESSAGE.getText())).queue();
+                                BotController.getLinkCodes().put(FINAL_CODE, event.getAuthor());
+                                return;
+                            }
+                            event.getChannel().sendMessageEmbeds(embedManager.errorEmbed(Message.CAN_NOT_SEND_MESSAGE.getText())).queue();
+                        });
                 break;
             }
             case "online": {
@@ -65,13 +75,38 @@ public class EventListener extends ListenerAdapter {
                 event.getChannel().sendMessageEmbeds(embedManager.successfulEmbed(Message.COMMAND_EXECUTED.getText())).queue();
                 break;
             }
+            case "embed": {
+                if(args.length < 4) {
+                    event.getChannel().sendMessageEmbeds(embedManager.infoEmbed(Message.DISCORD_EMBED_USAGE.getText())).queue();
+                    return;
+                }
+                String text = "";
+                for(int i = 3; i < args.length; i++) text += args[i] + " ";
+                text = text.trim();
+
+                Color color;
+                try {
+                    Field field = Class.forName("java.awt.Color").getField(args[2].toUpperCase());
+                    color = (Color) field.get(null);
+                } catch (Exception e) {
+                    color = null;
+                }
+
+                if(color == null) {
+                    event.getChannel().sendMessageEmbeds(embedManager.errorEmbed(Message.INVALID_COLOR_VALUE.getText())).queue();
+                    return;
+                }
+
+                event.getChannel().sendMessageEmbeds(embedManager.embed(args[0], text, color, Message.EMBED_SENT_BY.getText().replace("%sender%",
+                        event.getAuthor().getAsTag()))).queue();
+            }
         }
     }
 
     @Override
     public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
         if(DiscordUtils.hasTwoFactor(event.getUser())) {
-            if(!event.getPrivateChannel().equals(Objects.requireNonNull(event.getUser()).openPrivateChannel().complete())) return;
+            if(!event.getPrivateChannel().equals(event.getUser().openPrivateChannel().complete())) return;
             Player player = DiscordUtils.getPlayer(event.getUser());
             if(player == null) return;
             if(event.getReaction().getReactionEmote().getName().equals("✅")) {

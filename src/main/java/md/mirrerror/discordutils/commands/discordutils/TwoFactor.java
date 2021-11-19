@@ -8,7 +8,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class TwoFactor extends SubCommand {
+public class TwoFactor implements SubCommand {
 
     @Override
     public void onCommand(CommandSender sender, Command command, String label, String[] args) {

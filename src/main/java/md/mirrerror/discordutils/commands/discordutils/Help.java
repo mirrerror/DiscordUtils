@@ -5,7 +5,7 @@ import md.mirrerror.discordutils.config.Message;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-public class Help extends SubCommand {
+public class Help implements SubCommand {
     @Override
     public void onCommand(CommandSender sender, Command command, String label, String[] args) {
         Message.HELP.getStringList().forEach(sender::sendMessage);

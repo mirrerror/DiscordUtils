@@ -7,12 +7,14 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import java.awt.*;
 
 public class EmbedManager {
+    private final String DISCORD = "mirrerror#4790";
+
     public MessageEmbed errorEmbed(String text) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setTitle(Message.ERROR.getText());
         embedBuilder.setColor(Color.RED);
         embedBuilder.setDescription(text);
-        embedBuilder.setFooter("Bot by mirrerror#4790");
+        embedBuilder.setFooter("Bot by " + DISCORD);
         return embedBuilder.build();
     }
 
@@ -21,7 +23,7 @@ public class EmbedManager {
         embedBuilder.setTitle(Message.SUCCESSFULLY.getText());
         embedBuilder.setColor(Color.GREEN);
         embedBuilder.setDescription(text);
-        embedBuilder.setFooter("Bot by mirrerror#4790");
+        embedBuilder.setFooter("Bot by " + DISCORD);
         return embedBuilder.build();
     }
 
@@ -30,7 +32,7 @@ public class EmbedManager {
         embedBuilder.setTitle(Message.INFORMATION.getText());
         embedBuilder.setColor(Color.YELLOW);
         embedBuilder.setDescription(text);
-        embedBuilder.setFooter("Bot by mirrerror#4790");
+        embedBuilder.setFooter("Bot by " + DISCORD);
         return embedBuilder.build();
     }
 
@@ -39,7 +41,16 @@ public class EmbedManager {
         embedBuilder.setTitle(title);
         embedBuilder.setColor(color);
         embedBuilder.setDescription(text);
-        embedBuilder.setFooter("Bot by mirrerror#4790");
+        embedBuilder.setFooter("Bot by " + DISCORD);
+        return embedBuilder.build();
+    }
+
+    public MessageEmbed embed(String title, String text, Color color, String footer) {
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.setTitle(title);
+        embedBuilder.setColor(color);
+        embedBuilder.setDescription(text);
+        embedBuilder.setFooter(footer + " / Bot by " + DISCORD);
         return embedBuilder.build();
     }
 }

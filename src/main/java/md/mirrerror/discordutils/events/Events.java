@@ -33,19 +33,34 @@ public class Events implements Listener {
 
             EmbedManager embedManager = new EmbedManager();
             if(Main.getTwoFactorType() == Main.TwoFactorType.REACTION) {
-                DiscordUtils.getDiscordUser(player).openPrivateChannel().complete().sendMessageEmbeds(embedManager.infoEmbed(Message.TWOFACTOR_REACTION_MESSAGE.getText().replace("%playerIp%", playerIp))).queue(message -> {
-                    message.addReaction("✅").queue();
-                    message.addReaction("❎").queue();
+                DiscordUtils.getDiscordUser(player).openPrivateChannel().submit()
+                .thenCompose(channel -> channel.sendMessageEmbeds(embedManager.infoEmbed(Message.TWOFACTOR_REACTION_MESSAGE.getText().replace("%playerIp%", playerIp))).submit())
+                .whenComplete((msg, error) -> {
+                    if (error == null) {
+                        msg.addReaction("✅").queue();
+                        msg.addReaction("❎").queue();
+                        BotController.getTwoFactorPlayers().put(player, "reaction");
+                        return;
+                    }
+                    player.sendMessage(Message.CAN_NOT_SEND_MESSAGE.getText(true));
                 });
-                BotController.getTwoFactorPlayers().put(player, "reaction");
             }
             if(Main.getTwoFactorType() == Main.TwoFactorType.CODE) {
                 String code = "";
                 byte[] secureRandomSeed = new SecureRandom().generateSeed(20);
                 for(byte b : secureRandomSeed) code += b;
                 code = code.replace("-", "");
-                DiscordUtils.getDiscordUser(player).openPrivateChannel().complete().sendMessageEmbeds(embedManager.infoEmbed(Message.TWOFACTOR_CODE_MESSAGE.getText().replace("%code%", code).replace("%playerIp%", playerIp))).queue();
-                BotController.getTwoFactorPlayers().put(player, code);
+
+                final String FINAL_CODE = code;
+                DiscordUtils.getDiscordUser(player).openPrivateChannel().submit()
+                .thenCompose(channel -> channel.sendMessageEmbeds(embedManager.infoEmbed(Message.TWOFACTOR_CODE_MESSAGE.getText().replace("%code%", FINAL_CODE).replace("%playerIp%", playerIp))).submit())
+                .whenComplete((msg, error) -> {
+                    if (error == null) {
+                        BotController.getTwoFactorPlayers().put(player, FINAL_CODE);
+                        return;
+                    }
+                    player.sendMessage(Message.CAN_NOT_SEND_MESSAGE.getText(true));
+                });
             }
         }
     }
