@@ -3,6 +3,7 @@ package md.mirrerror.discordutils.commands.discordutils;
 import md.mirrerror.discordutils.Main;
 import md.mirrerror.discordutils.commands.SubCommand;
 import md.mirrerror.discordutils.config.Message;
+import md.mirrerror.discordutils.database.DatabaseManager;
 import md.mirrerror.discordutils.discord.BotController;
 import md.mirrerror.discordutils.discord.DiscordUtils;
 import net.dv8tion.jda.api.entities.Role;
@@ -33,16 +34,21 @@ public class Link implements SubCommand {
             return;
         }
 
-        Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".userId", "" + BotController.getLinkCodes().get(args[0]).getId());
-        Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".2factor", false);
-        Main.getInstance().getConfigManager().saveConfigFiles();
-        if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.VerifiedRole.Enabled")) {
-            long roleId = Main.getInstance().getConfigManager().getConfig().getLong("Discord.VerifiedRole.Id");
-            if(roleId > 0) {
-                BotController.getJda().getGuilds().forEach(guild -> {
-                    Role verifiedRole = DiscordUtils.getVerifiedRole(guild);
-                    if(verifiedRole != null) guild.addRoleToMember(guild.retrieveMember(BotController.getLinkCodes().get(args[0])).complete(), verifiedRole).queue();
-                });
+        if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
+            DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
+            databaseManager.registerPlayer(player.getUniqueId(), Long.parseLong(BotController.getLinkCodes().get(args[0]).getId()), false);
+        } else {
+            Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".userId", "" + BotController.getLinkCodes().get(args[0]).getId());
+            Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".2factor", false);
+            Main.getInstance().getConfigManager().saveConfigFiles();
+            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.VerifiedRole.Enabled")) {
+                long roleId = Main.getInstance().getConfigManager().getConfig().getLong("Discord.VerifiedRole.Id");
+                if(roleId > 0) {
+                    BotController.getJda().getGuilds().forEach(guild -> {
+                        Role verifiedRole = DiscordUtils.getVerifiedRole(guild);
+                        if(verifiedRole != null) guild.addRoleToMember(guild.retrieveMember(BotController.getLinkCodes().get(args[0])).complete(), verifiedRole).queue();
+                    });
+                }
             }
         }
         BotController.getLinkCodes().remove(args[0]);

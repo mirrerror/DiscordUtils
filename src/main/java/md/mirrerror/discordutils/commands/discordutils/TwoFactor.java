@@ -3,6 +3,7 @@ package md.mirrerror.discordutils.commands.discordutils;
 import md.mirrerror.discordutils.Main;
 import md.mirrerror.discordutils.commands.SubCommand;
 import md.mirrerror.discordutils.config.Message;
+import md.mirrerror.discordutils.database.DatabaseManager;
 import md.mirrerror.discordutils.discord.DiscordUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -24,13 +25,28 @@ public class TwoFactor implements SubCommand {
         }
 
         if(DiscordUtils.hasTwoFactor(player)) {
-            Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".2factor", false);
+
+            if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
+                DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
+                databaseManager.setTwoFactor(player.getUniqueId(), false);
+            } else {
+                Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".2factor", false);
+                Main.getInstance().getConfigManager().saveConfigFiles();
+            }
             sender.sendMessage(Message.DISCORDUTILS_TWOFACTOR_SUCCESSFUL.getText(true) + Message.DISABLED.getText());
+
         } else {
-            Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".2factor", true);
+
+            if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
+                DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
+                databaseManager.setTwoFactor(player.getUniqueId(), true);
+            } else {
+                Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".2factor", true);
+                Main.getInstance().getConfigManager().saveConfigFiles();
+            }
             sender.sendMessage(Message.DISCORDUTILS_TWOFACTOR_SUCCESSFUL.getText(true) + Message.ENABLED.getText());
+
         }
-        Main.getInstance().getConfigManager().saveConfigFiles();
     }
 
     @Override

@@ -1,5 +1,5 @@
 name: DiscordUtils
-version: '1.7'
+version: '1.8'
 main: md.mirrerror.discordutils.Main
 softdepend:
   - 'Vault'

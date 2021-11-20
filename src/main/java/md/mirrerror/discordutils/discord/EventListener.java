@@ -71,7 +71,9 @@ public class EventListener extends ListenerAdapter {
                 String command = "";
                 for(int i = 1; i < args.length; i++) command += args[i] + " ";
                 command = command.trim();
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+
+                final String FINAL_COMMAND = command;
+                Bukkit.getScheduler().runTask(Main.getInstance(), () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), FINAL_COMMAND));
                 event.getChannel().sendMessageEmbeds(embedManager.successfulEmbed(Message.COMMAND_EXECUTED.getText())).queue();
                 break;
             }
@@ -101,7 +103,7 @@ public class EventListener extends ListenerAdapter {
                     return;
                 }
 
-                event.getChannel().sendMessageEmbeds(embedManager.embed(args[0], text, color, Message.EMBED_SENT_BY.getText().replace("%sender%",
+                event.getChannel().sendMessageEmbeds(embedManager.embed(args[1], text, color, Message.EMBED_SENT_BY.getText().replace("%sender%",
                         event.getAuthor().getAsTag()))).queue();
             }
         }

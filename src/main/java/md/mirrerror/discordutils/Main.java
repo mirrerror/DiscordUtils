@@ -4,6 +4,8 @@ import md.mirrerror.discordutils.commands.CommandManager;
 import md.mirrerror.discordutils.commands.SubCommand;
 import md.mirrerror.discordutils.commands.discordutils.*;
 import md.mirrerror.discordutils.config.ConfigManager;
+import md.mirrerror.discordutils.database.DatabaseManager;
+import md.mirrerror.discordutils.database.MySQLManager;
 import md.mirrerror.discordutils.discord.BotController;
 import md.mirrerror.discordutils.events.Events;
 import md.mirrerror.discordutils.integrations.permissions.LuckPermsIntegration;
@@ -26,6 +28,7 @@ public final class Main extends JavaPlugin {
     private ConfigManager configManager;
     private static PermissionsPlugin permissionsPlugin;
     private static TwoFactorType twoFactorType;
+    private static DatabaseType databaseType;
     private static final int PLUGIN_ID = 13243; // metrics
 
     public enum PermissionsPlugin {
@@ -35,6 +38,17 @@ public final class Main extends JavaPlugin {
             switch (this) {
                 case LUCK_PERMS: return new LuckPermsIntegration();
                 case VAULT: return new VaultIntegration();
+                default: return null;
+            }
+        }
+    }
+
+    public enum DatabaseType {
+        NONE, MYSQL;
+
+        public DatabaseManager getDatabaseManager() {
+            switch (this) {
+                case MYSQL: return new MySQLManager();
                 default: return null;
             }
         }
@@ -59,6 +73,9 @@ public final class Main extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new Events(), this);
         getLogger().info("Events successfully loaded.");
         setupTwoFactorType();
+        getLogger().info("2FA successfully loaded.");
+        setupDatabaseType();
+        getLogger().info("DatabaseManager successfully loaded.");
         setupMetrics();
         getLogger().info("Metrics successfully loaded.");
         if(configManager.getConfig().getBoolean("CheckForUpdates")) {
@@ -116,6 +133,20 @@ public final class Main extends JavaPlugin {
         }
     }
 
+    private void setupDatabaseType() {
+        String type = configManager.getConfig().getString("Database.Type").toUpperCase();
+        switch (type) {
+            case "MYSQL": {
+                databaseType = DatabaseType.valueOf(type);
+                break;
+            }
+            default: {
+                databaseType = DatabaseType.NONE;
+                break;
+            }
+        }
+    }
+
     private void registerCommands() {
         CommandManager commandManager = new CommandManager();
         List<SubCommand> subCommands = new ArrayList<>();
@@ -141,5 +172,9 @@ public final class Main extends JavaPlugin {
 
     public static TwoFactorType getTwoFactorType() {
         return twoFactorType;
+    }
+
+    public static DatabaseType getDatabaseType() {
+        return databaseType;
     }
 }

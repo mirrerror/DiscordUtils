@@ -1,6 +1,7 @@
 package md.mirrerror.discordutils.discord;
 
 import md.mirrerror.discordutils.Main;
+import md.mirrerror.discordutils.database.DatabaseManager;
 import md.mirrerror.discordutils.integrations.permissions.PermissionsIntegration;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
@@ -16,14 +17,26 @@ import java.util.UUID;
 public class DiscordUtils {
 
     public static boolean isVerified(Player player) {
+        if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
+            DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
+            return databaseManager.playerExists(player.getUniqueId());
+        }
         return Main.getInstance().getConfigManager().getData().getConfigurationSection("DiscordLink").contains(player.getUniqueId().toString());
     }
 
     public static boolean isVerified(OfflinePlayer offlinePlayer) {
+        if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
+            DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
+            return databaseManager.playerExists(offlinePlayer.getUniqueId());
+        }
         return Main.getInstance().getConfigManager().getData().getConfigurationSection("DiscordLink").contains(offlinePlayer.getUniqueId().toString());
     }
 
     public static boolean isVerified(User user) {
+        if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
+            DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
+            return databaseManager.userLinked(user.getIdLong());
+        }
         for(String s : Main.getInstance().getConfigManager().getData().getConfigurationSection("DiscordLink").getKeys(false)) {
             if(Long.parseLong(Main.getInstance().getConfigManager().getData().getString("DiscordLink." + s + ".userId")) == user.getIdLong()) return true;
         }
@@ -31,15 +44,28 @@ public class DiscordUtils {
     }
 
     public static User getDiscordUser(Player player) {
+        if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
+            DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
+            return BotController.getJda().retrieveUserById(databaseManager.getUserId(player.getUniqueId())).complete();
+        }
         return BotController.getJda().retrieveUserById(Main.getInstance().getConfigManager().getData().getString("DiscordLink." + player.getUniqueId().toString() + ".userId")).complete();
     }
 
     public static User getDiscordUser(OfflinePlayer offlinePlayer) {
+        if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
+            DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
+            return BotController.getJda().retrieveUserById(databaseManager.getUserId(offlinePlayer.getUniqueId())).complete();
+        }
         return BotController.getJda().retrieveUserById(Main.getInstance().getConfigManager().getData().getString("DiscordLink." + offlinePlayer.getUniqueId().toString() + ".userId")).complete();
     }
 
     public static OfflinePlayer getOfflinePlayer(User user) {
         if(isVerified(user)) {
+            if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
+                DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
+                return Bukkit.getOfflinePlayer(databaseManager.getPlayer(user.getIdLong()));
+            }
+
             for (String s : Main.getInstance().getConfigManager().getData().getConfigurationSection("DiscordLink").getKeys(false)) {
                 if(Long.parseLong(Main.getInstance().getConfigManager().getData().getString("DiscordLink." + s + ".userId")) == user.getIdLong())
                     return Bukkit.getOfflinePlayer(UUID.fromString(s));
@@ -50,6 +76,11 @@ public class DiscordUtils {
 
     public static Player getPlayer(User user) {
         if(isVerified(user)) {
+            if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
+                DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
+                return Bukkit.getPlayer(databaseManager.getPlayer(user.getIdLong()));
+            }
+
             for (String s : Main.getInstance().getConfigManager().getData().getConfigurationSection("DiscordLink").getKeys(false)) {
                 if(Long.parseLong(Main.getInstance().getConfigManager().getData().getString("DiscordLink." + s + ".userId")) == user.getIdLong())
                     return Bukkit.getPlayer(UUID.fromString(s));
@@ -59,10 +90,19 @@ public class DiscordUtils {
     }
 
     public static boolean hasTwoFactor(Player player) {
+        if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
+            DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
+            return databaseManager.hasTwoFactor(player.getUniqueId());
+        }
         return Main.getInstance().getConfigManager().getData().getBoolean("DiscordLink." + player.getUniqueId() + ".2factor");
     }
 
     public static boolean hasTwoFactor(User user) {
+        if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
+            DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
+            return databaseManager.hasTwoFactor(databaseManager.getPlayer(user.getIdLong()));
+        }
+
         for(String s : Main.getInstance().getConfigManager().getData().getConfigurationSection("DiscordLink").getKeys(false)) {
             if(Long.parseLong(Main.getInstance().getConfigManager().getData().getString("DiscordLink." + s + ".userId")) == user.getIdLong())
                 return Main.getInstance().getConfigManager().getData().getBoolean("DiscordLink." + s + ".2factor");
