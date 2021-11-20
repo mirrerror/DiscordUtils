@@ -149,8 +149,10 @@ public class EventListener extends ListenerAdapter {
             long difference = Duration.between(BotController.getVoiceTime().get(user), localDateTime).getSeconds();
             long multiplier = Math.round(difference/Main.getInstance().getConfigManager().getConfig().getDouble("Discord.GuildVoiceRewards.Time"));
             BotController.getVoiceTime().remove(user);
-            for (long i = 0; i < multiplier; i++) Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                    Main.getInstance().getConfigManager().getConfig().getString("Discord.GuildVoiceRewards.Reward").replace("%player%", DiscordUtils.getOfflinePlayer(user).getName()));
+            for (long i = 0; i < multiplier; i++) Bukkit.getScheduler().callSyncMethod(Main.getInstance(), () ->
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                            Main.getInstance().getConfigManager().getConfig().getString("Discord.GuildVoiceRewards.Reward")
+                                    .replace("%player%", DiscordUtils.getOfflinePlayer(user).getName())));
         }
     }
 
