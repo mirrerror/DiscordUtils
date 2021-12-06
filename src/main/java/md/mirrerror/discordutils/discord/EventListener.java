@@ -2,6 +2,7 @@ package md.mirrerror.discordutils.discord;
 
 import md.mirrerror.discordutils.Main;
 import md.mirrerror.discordutils.config.Message;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
@@ -112,6 +113,7 @@ public class EventListener extends ListenerAdapter {
     @Override
     public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
         if(DiscordUtils.hasTwoFactor(event.getUser())) {
+            if(event.getChannelType() != ChannelType.PRIVATE) return;
             if(!event.getPrivateChannel().equals(event.getUser().openPrivateChannel().complete())) return;
             Player player = DiscordUtils.getPlayer(event.getUser());
             if(player == null) return;

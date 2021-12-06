@@ -39,7 +39,8 @@ public class BotController {
                 }
                 Main.getInstance().getLogger().info("Bot successfully loaded.");
             } catch (LoginException e) {
-                e.printStackTrace();
+                Main.getInstance().getLogger().severe("Something went wrong while setting up the bot!");
+                Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
             }
         });
     }

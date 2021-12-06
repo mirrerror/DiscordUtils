@@ -140,21 +140,7 @@ public class DiscordUtils {
         if(permissionsIntegration == null) return;
         List<String> groups = permissionsIntegration.getUserGroups(offlinePlayer);
         Map<Long, String> groupRoles = BotController.getGroupRoles();
-        /*for(String s : groups) {
-            if(groupRoles.containsValue(s)) {
-                groupRoles.forEach((groupId, group) -> { if(group.equals(s)) {
-                    Role role = BotController.getJda().getRoleById(groupId);
-                    BotController.getJda().getGuilds().forEach(guild -> {
-                        if(DiscordUtils.isVerified(player)) {
-                            User user = DiscordUtils.getDiscordUser(player);
-                            if(guild.retrieveMember(user).complete() != null) {
-                                if(role != null) guild.addRoleToMember(guild.retrieveMember(user).complete(), role).queue();
-                            }
-                        }
-                    });
-                }});
-            }
-        }*/
+
         for(Long roleId : groupRoles.keySet()) {
             String group = groupRoles.get(roleId);
             Role role = BotController.getJda().getRoleById(roleId);

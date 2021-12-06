@@ -24,7 +24,8 @@ public class Events implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        DiscordUtils.checkRoles(player);
+
+        Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> DiscordUtils.checkRoles(player));
         if(DiscordUtils.hasTwoFactor(player)) {
             String playerIp = StringUtils.remove(player.getAddress().getAddress().toString(), '/');
 
@@ -68,28 +69,34 @@ public class Events implements Listener {
     @EventHandler
     public void onDisconnect(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        DiscordUtils.checkRoles(player);
+        Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> DiscordUtils.checkRoles(player));
         BotController.getTwoFactorPlayers().remove(player);
     }
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         checkTwoFactor(event.getPlayer(), event);
+        checkVerification(event.getPlayer(), event);
     }
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         checkTwoFactor(event.getPlayer(), event);
+        checkVerification(event.getPlayer(), event);
     }
 
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
         checkTwoFactor(event.getPlayer(), event);
+        checkVerification(event.getPlayer(), event);
     }
 
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent event) {
         checkTwoFactor(event.getPlayer(), event);
+        if(!(event.getMessage().startsWith("/discordutils link") || event.getMessage().startsWith("/disutils link") || event.getMessage().startsWith("/du link"))) {
+            checkVerification(event.getPlayer(), event);
+        }
     }
 
     @EventHandler
@@ -112,21 +119,25 @@ public class Events implements Listener {
     public void onDamage(EntityDamageEvent event) {
         if(!(event.getEntity() instanceof Player)) return;
         checkTwoFactor((Player) event.getEntity(), event);
+        checkVerification((Player) event.getEntity(), event);
     }
 
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
         checkTwoFactor(event.getPlayer(), event);
+        checkVerification(event.getPlayer(), event);
     }
 
     @EventHandler
     public void onPlace(BlockPlaceEvent event) {
         checkTwoFactor(event.getPlayer(), event);
+        checkVerification(event.getPlayer(), event);
     }
 
     @EventHandler
     public void onConsume(PlayerItemConsumeEvent event) {
         checkTwoFactor(event.getPlayer(), event);
+        checkVerification(event.getPlayer(), event);
     }
 
     @EventHandler
@@ -136,27 +147,43 @@ public class Events implements Listener {
             player.getInventory().addItem(event.getBrokenItem());
             player.sendMessage(Message.TWOFACTOR_NEEDED.getText(true));
         }
+        if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.ForceVerification") && !DiscordUtils.isVerified(player)) {
+            player.getInventory().addItem(event.getBrokenItem());
+            player.sendMessage(Message.VERIFICATION_NEEDED.getText(true));
+        }
     }
 
     @EventHandler
     public void onDamageItem(PlayerItemDamageEvent event) {
         checkTwoFactor(event.getPlayer(), event);
+        checkVerification(event.getPlayer(), event);
     }
 
     @EventHandler
     public void onHeldItem(PlayerItemHeldEvent event) {
         checkTwoFactor(event.getPlayer(), event);
+        checkVerification(event.getPlayer(), event);
     }
 
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         checkTwoFactor((Player) event.getWhoClicked(), event);
+        checkVerification((Player) event.getWhoClicked(), event);
     }
 
     private void checkTwoFactor(Player player, Cancellable event) {
         if(BotController.getTwoFactorPlayers().containsKey(player)) {
             event.setCancelled(true);
             player.sendMessage(Message.TWOFACTOR_NEEDED.getText(true));
+        }
+    }
+
+    private void checkVerification(Player player, Cancellable event) {
+        if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.ForceVerification")) {
+            if(!DiscordUtils.isVerified(player)) {
+                event.setCancelled(true);
+                player.sendMessage(Message.VERIFICATION_NEEDED.getText(true));
+            }
         }
     }
 

@@ -15,6 +15,7 @@ import md.mirrerror.discordutils.metrics.Metrics;
 import md.mirrerror.discordutils.utils.UpdateChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,7 +67,7 @@ public final class Main extends JavaPlugin {
         getLogger().info("Configuration files successfully loaded.");
         BotController.setupBot(configManager.getConfig().getString("Discord.BotToken"));
         checkOutForPermissionsPlugin();
-        if(!permissionsPlugin.name().equals("NONE")) getLogger().info("Successfully integrated with " + permissionsPlugin.name() + ".");
+        if(permissionsPlugin != PermissionsPlugin.NONE) getLogger().info("Successfully integrated with " + permissionsPlugin.name() + ".");
         else getLogger().info("You chose no permission plugin or it is not supported. Disabling this feature.");
         registerCommands();
         getLogger().info("Commands successfully loaded.");
@@ -81,14 +82,15 @@ public final class Main extends JavaPlugin {
         if(configManager.getConfig().getBoolean("CheckForUpdates")) {
             getLogger().info("Checking for updates...");
             UpdateChecker.checkForUpdates();
+            //UpdateChecker.downloadUpdate();
         }
     }
 
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        BotController.getJda().cancelRequests();
-        BotController.getJda().shutdown();
+        //Bukkit.getScheduler().getPendingTasks().forEach(BukkitTask::cancel);
+        //BotController.getJda().shutdownNow();
     }
 
     private void checkOutForPermissionsPlugin() {
@@ -155,6 +157,7 @@ public final class Main extends JavaPlugin {
         subCommands.add(new TwoFactor());
         subCommands.add(new Help());
         subCommands.add(new SendToDiscord());
+        subCommands.add(new VoiceInvite());
         commandManager.registerCommand("discordutils", subCommands);
     }
 

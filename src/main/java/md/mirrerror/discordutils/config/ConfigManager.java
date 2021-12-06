@@ -50,7 +50,8 @@ public class ConfigManager {
             dataConfig.load(dataFile);
             langConfig.load(langFile);
         } catch (IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
+            Main.getInstance().getLogger().severe("Something went wrong while initializing the config files!");
+            Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
         }
     }
 
@@ -61,7 +62,8 @@ public class ConfigManager {
             langConfig.save(langFile);
             Main.getInstance().getLogger().info("Successfully saved the config files.");
         } catch (IOException e) {
-            e.printStackTrace();
+            Main.getInstance().getLogger().severe("Something went wrong while saving the config files!");
+            Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
         }
     }
 
@@ -77,7 +79,8 @@ public class ConfigManager {
             BotController.setupGroupRoles();
             Main.getInstance().getLogger().info("Successfully reloaded the config files.");
         } catch (IOException | InvalidConfigurationException e) {
-            e.printStackTrace();
+            Main.getInstance().getLogger().severe("Something went wrong while loading the config files!");
+            Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
         }
     }
 

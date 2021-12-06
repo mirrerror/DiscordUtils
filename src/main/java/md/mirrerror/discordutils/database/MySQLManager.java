@@ -44,7 +44,8 @@ public class MySQLManager implements DatabaseManager {
             PreparedStatement preparedStatement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS players (uuid varchar(255), userId bigint, twoFactor boolean);");
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            Main.getInstance().getLogger().severe("Something went wrong while setting up the database table!");
+            Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
         }
     }
 
@@ -57,7 +58,8 @@ public class MySQLManager implements DatabaseManager {
             preparedStatement.setBoolean(3, twoFactor);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            Main.getInstance().getLogger().severe("Something went wrong while registering a player in the database!");
+            Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
         }
     }
 
@@ -69,7 +71,8 @@ public class MySQLManager implements DatabaseManager {
             ResultSet resultSet = preparedStatement.executeQuery();
             return resultSet.next();
         } catch (SQLException e) {
-            e.printStackTrace();
+            Main.getInstance().getLogger().severe("Something went wrong while checking if a player is registered in the database!");
+            Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
         }
         return false;
     }
@@ -82,7 +85,8 @@ public class MySQLManager implements DatabaseManager {
             ResultSet resultSet = preparedStatement.executeQuery();
             return resultSet.next();
         } catch (SQLException e) {
-            e.printStackTrace();
+            Main.getInstance().getLogger().severe("Something went wrong while checking if a player is verified (database)!");
+            Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
         }
         return false;
     }
@@ -97,7 +101,8 @@ public class MySQLManager implements DatabaseManager {
                 return UUID.fromString(resultSet.getString("uuid"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            Main.getInstance().getLogger().severe("Something went wrong while getting a player from the database!");
+            Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
         }
         return null;
     }
@@ -110,7 +115,8 @@ public class MySQLManager implements DatabaseManager {
             preparedStatement.setBoolean(1, twoFactor);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            Main.getInstance().getLogger().severe("Something went wrong while changing a player's 2FA settings!");
+            Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
         }
     }
 
@@ -124,7 +130,8 @@ public class MySQLManager implements DatabaseManager {
                 return resultSet.getBoolean("twoFactor");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            Main.getInstance().getLogger().severe("Something went wrong while checking if a player has 2FA enabled (database)!");
+            Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
         }
         return false;
     }
@@ -137,7 +144,8 @@ public class MySQLManager implements DatabaseManager {
             preparedStatement.setLong(1, userId);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            Main.getInstance().getLogger().severe("Something went wrong while setting a player's Discord user ID (database)!");
+            Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
         }
     }
 
@@ -151,7 +159,8 @@ public class MySQLManager implements DatabaseManager {
                 return resultSet.getLong("userId");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            Main.getInstance().getLogger().severe("Something went wrong while getting a player's Discord user ID (database)!");
+            Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
         }
         return -1;
     }
