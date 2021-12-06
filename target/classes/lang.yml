@@ -46,3 +46,4 @@ HELP:
   - '&7-&b /du twofactor&f - включить/выключить двухфакторную аутентификацию через Discord'
   - '&7-&b /du sendtodiscord [заголовок] [цвет] [текст]&f - отправить сообщение из игры в Discord'
   - '&7-&b /discordutils sendtodiscord [заголовок] [цвет] [текст]&f - отправить сообщение в Discord'
+  - '&7-&b /discordutils voiceinvite&f - пригласить всех игроков онлайн в голосовой канал Discord, в котором Вы находитесь'
