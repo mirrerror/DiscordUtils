@@ -17,6 +17,8 @@ public class ConfigManager {
     private FileConfiguration dataConfig;
     private File langFile;
     private FileConfiguration langConfig;
+    /*private File slashCommandsFile;
+    private FileConfiguration slashCommandsConfig;*/
 
     public ConfigManager() {
         initializeConfigFiles();
@@ -27,7 +29,7 @@ public class ConfigManager {
         if(!configFile.exists()) {
             configFile.getParentFile().mkdirs();
             Main.getInstance().saveResource(configFile.getName(), false);
-            Main.getInstance().getLogger().info(Message.PREFIX.getText() + "Config file '" + configFile.getName() + "' has been successfully created.");
+            Main.getInstance().getLogger().info("Config file '" + configFile.getName() + "' has been successfully created.");
         }
         dataFile = new File(Main.getInstance().getDataFolder(), "data.yml");
         if(!dataFile.exists()) {
@@ -41,14 +43,22 @@ public class ConfigManager {
             Main.getInstance().saveResource(langFile.getName(), false);
             Main.getInstance().getLogger().info("Config file '" + langFile.getName() + "' has been successfully created.");
         }
+        /*slashCommandsFile = new File(Main.getInstance().getDataFolder(), "slash_commands.yml");
+        if(!slashCommandsFile.exists()) {
+            slashCommandsFile.getParentFile().mkdirs();
+            Main.getInstance().saveResource(slashCommandsFile.getName(), false);
+            Main.getInstance().getLogger().info("Config file '" + slashCommandsFile.getName() + "' has been successfully created.");
+        }*/
 
         config = new YamlConfiguration();
         dataConfig = new YamlConfiguration();
         langConfig = new YamlConfiguration();
+        //slashCommandsConfig = new YamlConfiguration();
         try {
             config.load(configFile);
             dataConfig.load(dataFile);
             langConfig.load(langFile);
+            //slashCommandsConfig.load(slashCommandsFile);
         } catch (IOException | InvalidConfigurationException e) {
             Main.getInstance().getLogger().severe("Something went wrong while initializing the config files!");
             Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
@@ -60,6 +70,7 @@ public class ConfigManager {
             config.save(configFile);
             dataConfig.save(dataFile);
             langConfig.save(langFile);
+            //slashCommandsConfig.save(slashCommandsFile);
             Main.getInstance().getLogger().info("Successfully saved the config files.");
         } catch (IOException e) {
             Main.getInstance().getLogger().severe("Something went wrong while saving the config files!");
@@ -71,10 +82,12 @@ public class ConfigManager {
         config = new YamlConfiguration();
         dataConfig = new YamlConfiguration();
         langConfig = new YamlConfiguration();
+        //slashCommandsConfig = new YamlConfiguration();
         try {
             config.load(configFile);
             dataConfig.load(dataFile);
             langConfig.load(langFile);
+            //slashCommandsConfig.save(slashCommandsFile);
             BotController.setupAdminRoles();
             BotController.setupGroupRoles();
             Main.getInstance().getLogger().info("Successfully reloaded the config files.");
@@ -95,4 +108,8 @@ public class ConfigManager {
     public FileConfiguration getLang() {
         return langConfig;
     }
+
+    /*public FileConfiguration getSlashCommands() {
+        return slashCommandsConfig;
+    }*/
 }

@@ -11,6 +11,10 @@ public enum Message {
     PREFIX,
     INSUFFICIENT_PERMISSIONS,
     ACCOUNT_SUCCESSFULLY_LINKED,
+    ACCOUNT_UNLINK_REQUEST_SENT,
+    ACCOUNT_SUCCESSFULLY_UNLINKED,
+    ACCOUNT_UNLINK_CONFIRMATION,
+    ACCOUNT_UNLINK_CANCELLED,
     INVALID_LINK_CODE,
     INVALID_TWOFACTOR_CODE,
     TWOFACTOR_REJECTED,
@@ -51,59 +55,28 @@ public enum Message {
     HELP;
 
     public String getText() {
-        return ChatColor.translateAlternateColorCodes('&', Main.getInstance().getConfigManager().getLang().getString(String.valueOf(this)));
+        return ChatColor.translateAlternateColorCodes('&', Main.getInstance().getConfigManager().getLang().getString(String.valueOf(this)).replace("\\n", "\n"));
     }
 
     public String getText(boolean addPrefix) {
-        if(addPrefix) return ChatColor.translateAlternateColorCodes('&', Main.getInstance().getConfigManager().getLang().getString(String.valueOf(PREFIX)) + " "
-                + ChatColor.translateAlternateColorCodes('&', Main.getInstance().getConfigManager().getLang().getString(String.valueOf(this))));
-        return ChatColor.translateAlternateColorCodes('&', Main.getInstance().getConfigManager().getLang().getString(String.valueOf(this)));
+        if(addPrefix) return PREFIX.getText() + " " + this.getText();
+        return this.getText();
     }
 
     public List<String> getStringList() {
         List<String> stringList = new ArrayList<>();
-        Main.getInstance().getConfigManager().getLang().getStringList(String.valueOf(this)).forEach(s -> stringList.add(ChatColor.translateAlternateColorCodes('&', s)));
+        Main.getInstance().getConfigManager().getLang().getStringList(String.valueOf(this)).forEach(s -> stringList.add(ChatColor.translateAlternateColorCodes('&', s).replace("\\n", "\n")));
         return stringList;
     }
 
     public List<String> getStringList(boolean addPrefix) {
         List<String> stringList = new ArrayList<>();
-        if(addPrefix)
-            Main.getInstance().getConfigManager().getLang().getStringList(String.valueOf(this)).forEach(s -> stringList.add(ChatColor.translateAlternateColorCodes('&',
-                    Main.getInstance().getConfigManager().getLang().getString(String.valueOf(PREFIX)) + " " + s)));
-        else Main.getInstance().getConfigManager().getLang().getStringList(String.valueOf(this)).forEach(s -> stringList.add(ChatColor.translateAlternateColorCodes('&', s)));
+        if(addPrefix) {
+            for(String s : Main.getInstance().getConfigManager().getLang().getStringList(String.valueOf(this))) {
+                stringList.add(ChatColor.translateAlternateColorCodes('&', PREFIX.getText() + " " + s.replace("\\n", "\n")));
+            }
+        } else return this.getStringList();
         return stringList;
     }
 
-/*    public static void sendMessage(Player player, Message message, boolean addPrefix) {
-        try {
-            message.getStringList(addPrefix).forEach(player::sendMessage);
-            return;
-        } catch (Exception ignored) {}
-        player.sendMessage(message.getText(addPrefix));
-    }
-
-    public static void sendMessage(Player player, Message message) {
-        try {
-            message.getStringList().forEach(player::sendMessage);
-            return;
-        } catch (Exception ignored) {}
-        player.sendMessage(message.getText());
-    }
-
-    public static void sendMessage(CommandSender commandSender, Message message, boolean addPrefix) {
-        try {
-            message.getStringList(addPrefix).forEach(commandSender::sendMessage);
-            return;
-        } catch (Exception ignored) {}
-        commandSender.sendMessage(message.getText(addPrefix));
-    }
-
-    public static void sendMessage(CommandSender commandSender, Message message) {
-        try {
-            message.getStringList().forEach(commandSender::sendMessage);
-            return;
-        } catch (Exception ignored) {}
-        commandSender.sendMessage(message.getText());
-    }*/
 }

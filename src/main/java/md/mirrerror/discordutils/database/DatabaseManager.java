@@ -9,6 +9,7 @@ public interface DatabaseManager {
 
     void setupTable();
     void registerPlayer(UUID uuid, long userId, boolean twoFactor);
+    void unregisterPlayer(UUID uuid);
     boolean playerExists(UUID uuid);
 
     boolean userLinked(long userId);

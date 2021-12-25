@@ -2,7 +2,9 @@ package md.mirrerror.discordutils.discord;
 
 import md.mirrerror.discordutils.Main;
 import md.mirrerror.discordutils.config.Message;
+import md.mirrerror.discordutils.database.DatabaseManager;
 import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
@@ -112,20 +114,59 @@ public class EventListener extends ListenerAdapter {
 
     @Override
     public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
-        if(DiscordUtils.hasTwoFactor(event.getUser())) {
-            if(event.getChannelType() != ChannelType.PRIVATE) return;
-            if(!event.getPrivateChannel().equals(event.getUser().openPrivateChannel().complete())) return;
-            Player player = DiscordUtils.getPlayer(event.getUser());
-            if(player == null) return;
-            if(event.getReaction().getReactionEmote().getName().equals("✅")) {
-                BotController.getTwoFactorPlayers().remove(player);
-                player.sendMessage(Message.TWOFACTOR_AUTHORIZED.getText(true));
-                BotController.getSessions().put(player.getUniqueId(), StringUtils.remove(player.getAddress().getAddress().toString(), '/'));
+        if(event.getChannelType() != ChannelType.PRIVATE) return;
+        if(event.getUser().equals(BotController.getJda().getSelfUser())) return;
+        if(!event.getPrivateChannel().equals(event.getUser().openPrivateChannel().complete())) return;
+        Player player = DiscordUtils.getPlayer(event.getUser());
+        if(player == null) return;
+
+        long messageId = event.getMessageIdLong();
+        if(BotController.getUnlinkPlayers().containsKey(player)) {
+            if(BotController.getUnlinkPlayers().get(player).getIdLong() == messageId) {
+
+                if(event.getReaction().getReactionEmote().getName().equals("✅")) {
+                    if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
+                        DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
+                        databaseManager.unregisterPlayer(player.getUniqueId());
+                    } else {
+                        Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId(), null);
+                        Main.getInstance().getConfigManager().saveConfigFiles();
+
+                        long roleId = Main.getInstance().getConfigManager().getConfig().getLong("Discord.VerifiedRole.Id");
+                        if(roleId > 0) {
+                            BotController.getJda().getGuilds().forEach(guild -> {
+                                Role verifiedRole = DiscordUtils.getVerifiedRole(guild);
+                                if(verifiedRole != null) guild.removeRoleFromMember(guild.retrieveMember(DiscordUtils.getDiscordUser(player)).complete(), verifiedRole).queue();
+                            });
+                        }
+                    }
+                    BotController.getUnlinkPlayers().remove(player);
+                    player.sendMessage(Message.ACCOUNT_SUCCESSFULLY_UNLINKED.getText(true));
+                }
+                if(event.getReaction().getReactionEmote().getName().equals("❎")) {
+                    BotController.getUnlinkPlayers().remove(player);
+                    player.sendMessage(Message.ACCOUNT_UNLINK_CANCELLED.getText(true));
+                }
+
+                event.getChannel().deleteMessageById(event.getMessageId()).queue();
+
             }
-            if(event.getReaction().getReactionEmote().getName().equals("❎")) {
-                Bukkit.getScheduler().runTask(Main.getInstance(), () -> player.kickPlayer(Message.TWOFACTOR_REJECTED.getText()));
+        }
+
+        if(BotController.getTwoFactorPlayers().containsKey(player)) {
+            if(messageId == Long.parseLong(BotController.getTwoFactorPlayers().get(player))) {
+                if(event.getReaction().getReactionEmote().getName().equals("✅")) {
+                    BotController.getTwoFactorPlayers().remove(player);
+                    player.sendMessage(Message.TWOFACTOR_AUTHORIZED.getText(true));
+                    BotController.getSessions().put(player.getUniqueId(), StringUtils.remove(player.getAddress().getAddress().toString(), '/'));
+                }
+                if(event.getReaction().getReactionEmote().getName().equals("❎")) {
+                    BotController.getTwoFactorPlayers().remove(player);
+                    Bukkit.getScheduler().runTask(Main.getInstance(), () -> player.kickPlayer(Message.TWOFACTOR_REJECTED.getText()));
+                }
+
+                event.getChannel().deleteMessageById(event.getMessageId()).queue();
             }
-            event.getChannel().deleteMessageById(event.getMessageId()).queue();
         }
     }
 

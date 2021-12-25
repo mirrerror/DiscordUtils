@@ -15,7 +15,6 @@ import md.mirrerror.discordutils.metrics.Metrics;
 import md.mirrerror.discordutils.utils.UpdateChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -158,6 +157,7 @@ public final class Main extends JavaPlugin {
         subCommands.add(new Help());
         subCommands.add(new SendToDiscord());
         subCommands.add(new VoiceInvite());
+        subCommands.add(new Unlink());
         commandManager.registerCommand("discordutils", subCommands);
     }
 

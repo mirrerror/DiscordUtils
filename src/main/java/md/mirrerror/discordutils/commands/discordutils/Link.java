@@ -39,7 +39,10 @@ public class Link implements SubCommand {
             databaseManager.registerPlayer(player.getUniqueId(), Long.parseLong(BotController.getLinkCodes().get(args[0]).getId()), false);
         } else {
             Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".userId", "" + BotController.getLinkCodes().get(args[0]).getId());
-            Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".2factor", false);
+
+            boolean defaultValue = Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.Default2FAValue");
+
+            Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".2factor", defaultValue);
             Main.getInstance().getConfigManager().saveConfigFiles();
             if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.VerifiedRole.Enabled")) {
                 long roleId = Main.getInstance().getConfigManager().getConfig().getLong("Discord.VerifiedRole.Id");

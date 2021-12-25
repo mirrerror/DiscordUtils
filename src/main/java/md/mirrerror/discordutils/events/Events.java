@@ -26,6 +26,7 @@ public class Events implements Listener {
         Player player = event.getPlayer();
 
         Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> DiscordUtils.checkRoles(player));
+        Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> DiscordUtils.checkNames(player));
         if(DiscordUtils.hasTwoFactor(player)) {
             String playerIp = StringUtils.remove(player.getAddress().getAddress().toString(), '/');
 
@@ -40,7 +41,7 @@ public class Events implements Listener {
                     if (error == null) {
                         msg.addReaction("✅").queue();
                         msg.addReaction("❎").queue();
-                        BotController.getTwoFactorPlayers().put(player, "reaction");
+                        BotController.getTwoFactorPlayers().put(player, msg.getId());
                         return;
                     }
                     player.sendMessage(Message.CAN_NOT_SEND_MESSAGE.getText(true));
@@ -70,6 +71,7 @@ public class Events implements Listener {
     public void onDisconnect(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> DiscordUtils.checkRoles(player));
+        Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> DiscordUtils.checkNames(player));
         BotController.getTwoFactorPlayers().remove(player);
     }
 

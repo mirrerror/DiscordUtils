@@ -64,6 +64,18 @@ public class MySQLManager implements DatabaseManager {
     }
 
     @Override
+    public void unregisterPlayer(UUID uuid) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("DELETE * FROM players WHERE uuid=?");
+            preparedStatement.setString(1, uuid.toString());
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            Main.getInstance().getLogger().severe("Something went wrong while registering a player in the database!");
+            Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
+        }
+    }
+
+    @Override
     public boolean playerExists(UUID uuid) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM players WHERE uuid=?");

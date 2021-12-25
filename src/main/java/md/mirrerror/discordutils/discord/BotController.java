@@ -3,6 +3,8 @@ package md.mirrerror.discordutils.discord;
 import md.mirrerror.discordutils.Main;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -23,22 +25,29 @@ public class BotController {
     private static Map<Player, String> twoFactorPlayers = new HashMap<>();
     private static Map<UUID, String> sessions = new HashMap<>();
     private static Map<User, LocalDateTime> voiceTime = new HashMap<>();
+    private static Map<Player, Message> unlinkPlayers = new HashMap<>();
 
     private static List<Long> rewardBlacklistedVoiceChannels = new ArrayList<>();
 
     public static void setupBot(String token) {
         Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
             try {
-                jda = JDABuilder.createDefault(token).build();
+                Activity.ActivityType activityType = Activity.ActivityType.valueOf(Main.getInstance().getConfigManager().getConfig().getString("Discord.Activity.Type").toUpperCase());
+                String activityText = Main.getInstance().getConfigManager().getConfig().getString("Discord.Activity.Text");
+                jda = JDABuilder.createDefault(token).setActivity(Activity.of(activityType, activityText)).build().awaitReady();
                 jda.addEventListener(new EventListener());
+                //new SlashCommandsManager();
                 setupGroupRoles();
                 setupAdminRoles();
                 setupRewardBlacklistedVoiceChannels();
                 if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.DelayedRolesCheck.Enabled")) {
                     DiscordUtils.setupDelayedRolesCheck();
                 }
+                if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.DelayedNamesCheck.Enabled")) {
+                    DiscordUtils.setupDelayedNamesCheck();
+                }
                 Main.getInstance().getLogger().info("Bot successfully loaded.");
-            } catch (LoginException e) {
+            } catch (LoginException | InterruptedException e) {
                 Main.getInstance().getLogger().severe("Something went wrong while setting up the bot!");
                 Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
             }
@@ -94,5 +103,9 @@ public class BotController {
 
     public static List<Long> getRewardBlacklistedVoiceChannels() {
         return rewardBlacklistedVoiceChannels;
+    }
+
+    public static Map<Player, Message> getUnlinkPlayers() {
+        return unlinkPlayers;
     }
 }
