@@ -7,6 +7,7 @@ import md.mirrerror.discordutils.database.DatabaseManager;
 import md.mirrerror.discordutils.discord.BotController;
 import md.mirrerror.discordutils.discord.DiscordUtils;
 import net.dv8tion.jda.api.entities.Role;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -56,6 +57,7 @@ public class Link implements SubCommand {
         }
         BotController.getLinkCodes().remove(args[0]);
         sender.sendMessage(Message.ACCOUNT_SUCCESSFULLY_LINKED.getText(true));
+        Main.getInstance().getConfigManager().getConfig().getStringList("Discord.CommandsAfterVerification").forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd));
     }
 
     @Override

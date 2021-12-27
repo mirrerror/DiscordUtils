@@ -6,6 +6,7 @@ import md.mirrerror.discordutils.commands.discordutils.*;
 import md.mirrerror.discordutils.config.ConfigManager;
 import md.mirrerror.discordutils.database.DatabaseManager;
 import md.mirrerror.discordutils.database.MySQLManager;
+import md.mirrerror.discordutils.discord.ActivityManager;
 import md.mirrerror.discordutils.discord.BotController;
 import md.mirrerror.discordutils.events.Events;
 import md.mirrerror.discordutils.integrations.permissions.LuckPermsIntegration;
@@ -26,6 +27,7 @@ public final class Main extends JavaPlugin {
     private static Main instance;
 
     private ConfigManager configManager;
+    private ActivityManager activityManager;
     private static PermissionsPlugin permissionsPlugin;
     private static TwoFactorType twoFactorType;
     private static DatabaseType databaseType;
@@ -63,6 +65,7 @@ public final class Main extends JavaPlugin {
         // Plugin startup logic
         instance = this;
         configManager = new ConfigManager();
+        activityManager = new ActivityManager();
         getLogger().info("Configuration files successfully loaded.");
         BotController.setupBot(configManager.getConfig().getString("Discord.BotToken"));
         checkOutForPermissionsPlugin();
@@ -171,6 +174,10 @@ public final class Main extends JavaPlugin {
 
     public ConfigManager getConfigManager() {
         return configManager;
+    }
+
+    public ActivityManager getActivityManager() {
+        return activityManager;
     }
 
     public static TwoFactorType getTwoFactorType() {

@@ -11,8 +11,9 @@
 # BotPrefix
 # Префикс, использующийся в командах бота
 # ------------------------------------------------------------------
-# Activity
-# Type - тип активности бота (доступные: default, streaming, listening, watching, custom_status, competing)
+# Activities
+# UpdateDelay - время в секундах, циклично по истечению которого будет обновляться активность бота
+# Type - тип активности бота (доступные: default, streaming, listening, watching, competing)
 # Text - текст активности
 # ------------------------------------------------------------------
 # GroupRoles
@@ -25,8 +26,8 @@
 # Пример: AdminRoles: [905508941230915684, 123123123131231233]
 # ------------------------------------------------------------------
 # VerifiedRole
-# Id - id роли, выдающейся после верификации
 # Enabled - true - выдавать, false - не выдавать
+# Id - id роли, выдающейся после верификации
 # ------------------------------------------------------------------
 # 2FAType
 # Тип двухфакторной аутентификации. code - ввести код, reaction - нажать на реакцию в Discord'e
@@ -37,8 +38,14 @@
 # Default2FAValue
 # Включать ли двухфакторную аутентификацию игроку сразу после верификации
 # ------------------------------------------------------------------
+# NotifyAboutDisabled2FA
+# Отправлять ли игроку при каждом заходе на сервер сообщение о том, что у него выключена двухфакторная аутентикация (если выключена)
+# ------------------------------------------------------------------
 # ForceVerification
 # Обязывать ли игроков пройти верификацию
+# ------------------------------------------------------------------
+# CommandsAfterVerification
+# Команды, которые выполняются сразу после того, как игрок верифицирует свой аккаунт (%player% - плейсхолдер для получения ника игрока)
 # ------------------------------------------------------------------
 # DelayedRolesCheck
 # Включить ли проверку ролей каждые Delay секунд (если выключить, то будет проверять только при выходе и входе игрока на сервер)
@@ -76,18 +83,28 @@ CheckForUpdates: true
 Discord:
   BotToken: ''
   BotPrefix: '!'
-  Activity:
-    Type: 'default'
-    Text: 'Minecraft'
+  Activities:
+    UpdateDelay: 10
+    1:
+      Type: 'default'
+      Text: 'Minecraft'
+    2:
+      Type: 'watching'
+      Text: 'mirrerror#4790'
+    3:
+      Type: 'watching'
+      Text: 'DiscordUtils'
   GroupRoles: {}
   AdminRoles: []
   VerifiedRole:
+    Enabled: false
     Id: -1
-    Enabled: true
   2FAType: 'reaction'
   2FASessions: true
   Default2FAValue: false
+  NotifyAboutDisabled2FA: true
   ForceVerification: false
+  CommandsAfterVerification: []
   DelayedRolesCheck:
     Enabled: true
     Delay: 30
@@ -100,7 +117,7 @@ Discord:
     Reward: 'eco give %player% 100'
     BlacklistedChannels: []
   MessagesChannel:
-    Enabled: true
+    Enabled: false
     Id: -1
 Database:
   Type: ''

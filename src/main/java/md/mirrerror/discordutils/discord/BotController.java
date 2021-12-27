@@ -32,14 +32,13 @@ public class BotController {
     public static void setupBot(String token) {
         Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
             try {
-                Activity.ActivityType activityType = Activity.ActivityType.valueOf(Main.getInstance().getConfigManager().getConfig().getString("Discord.Activity.Type").toUpperCase());
-                String activityText = Main.getInstance().getConfigManager().getConfig().getString("Discord.Activity.Text");
-                jda = JDABuilder.createDefault(token).setActivity(Activity.of(activityType, activityText)).build().awaitReady();
+                jda = JDABuilder.createDefault(token).build().awaitReady();
                 jda.addEventListener(new EventListener());
                 //new SlashCommandsManager();
                 setupGroupRoles();
                 setupAdminRoles();
                 setupRewardBlacklistedVoiceChannels();
+                setupActivityChanger();
                 if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.DelayedRolesCheck.Enabled")) {
                     DiscordUtils.setupDelayedRolesCheck();
                 }
@@ -67,6 +66,16 @@ public class BotController {
 
     public static void setupRewardBlacklistedVoiceChannels() {
         adminRoles = Main.getInstance().getConfigManager().getConfig().getLongList("Discord.GuildVoiceRewards.BlacklistedChannels");
+    }
+
+    public static void setupActivityChanger() {
+        if(Main.getInstance().getActivityManager().getBotActivities().size() <= 1) return;
+
+        long updateDelay = Main.getInstance().getConfigManager().getConfig().getLong("Discord.Activities.UpdateDelay");
+        Bukkit.getScheduler().runTaskTimer(Main.getInstance(), () -> {
+            Activity activity = Main.getInstance().getActivityManager().nextActivity();
+            jda.getPresence().setActivity(activity);
+        }, 0L, updateDelay*20L);
     }
 
     public static Map<Long, String> getGroupRoles() {

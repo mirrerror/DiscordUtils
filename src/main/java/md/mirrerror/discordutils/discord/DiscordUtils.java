@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -157,7 +158,12 @@ public class DiscordUtils {
             } else {
                 BotController.getJda().getGuilds().forEach(guild -> {
                     User user = DiscordUtils.getDiscordUser(offlinePlayer);
-                    Member member = guild.retrieveMember(user).complete();
+                    Member member = null;
+                    try {
+                        member = guild.retrieveMember(user).complete();
+                    } catch (ErrorResponseException exception) {
+                        if(exception.getErrorCode() != 10007) exception.printStackTrace();
+                    }
                     if(member != null) {
                         if(!guild.getMember(BotController.getJda().getSelfUser()).canInteract(member)) return;
                         if(role != null) guild.removeRoleFromMember(guild.retrieveMember(user).complete(), role).queue();
@@ -172,7 +178,12 @@ public class DiscordUtils {
 
         BotController.getJda().getGuilds().forEach(guild -> {
             User user = DiscordUtils.getDiscordUser(offlinePlayer);
-            Member member = guild.retrieveMember(user).complete();
+            Member member = null;
+            try {
+                member = guild.retrieveMember(user).complete();
+            } catch (ErrorResponseException exception) {
+                if(exception.getErrorCode() != 10007) exception.printStackTrace();
+            }
             if(member != null) {
                 if(!guild.getMember(BotController.getJda().getSelfUser()).canInteract(member)) return;
                 member.modifyNickname(offlinePlayer.getName()).queue();

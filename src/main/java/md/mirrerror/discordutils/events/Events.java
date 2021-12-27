@@ -65,6 +65,12 @@ public class Events implements Listener {
                 });
             }
         }
+
+        if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.NotifyAboutDisabled2FA")) {
+            if(DiscordUtils.isVerified(player)) {
+                if(!DiscordUtils.hasTwoFactor(player)) player.sendMessage(Message.TWOFACTOR_DISABLED_REMINDER.getText(true));
+            }
+        }
     }
 
     @EventHandler
