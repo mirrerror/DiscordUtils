@@ -16,22 +16,22 @@ public class Link implements SubCommand {
     @Override
     public void onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(!(sender instanceof Player)) {
-            sender.sendMessage(Message.SENDER_IS_NOT_A_PLAYER.getText(true));
+            Message.SENDER_IS_NOT_A_PLAYER.getFormattedText(true).forEach(sender::sendMessage);
             return;
         }
 
         if(args.length < 1) {
-            sender.sendMessage(Message.DISCORDUTILS_LINK_USAGE.getText(true));
+            Message.DISCORDUTILS_LINK_USAGE.getFormattedText(true).forEach(sender::sendMessage);
             return;
         }
         Player player = (Player) sender;
         if(DiscordUtils.isVerified(player)) {
-            sender.sendMessage(Message.ACCOUNT_ALREADY_VERIFIED.getText(true));
+            Message.ACCOUNT_ALREADY_VERIFIED.getFormattedText(true).forEach(sender::sendMessage);
             return;
         }
 
         if(!BotController.getLinkCodes().containsKey(args[0])) {
-            sender.sendMessage(Message.INVALID_LINK_CODE.getText(true));
+            Message.INVALID_LINK_CODE.getFormattedText(true).forEach(sender::sendMessage);
             return;
         }
 
@@ -56,7 +56,7 @@ public class Link implements SubCommand {
             }
         }
         BotController.getLinkCodes().remove(args[0]);
-        sender.sendMessage(Message.ACCOUNT_SUCCESSFULLY_LINKED.getText(true));
+        Message.ACCOUNT_SUCCESSFULLY_LINKED.getFormattedText(true).forEach(sender::sendMessage);
         Main.getInstance().getConfigManager().getConfig().getStringList("Discord.CommandsAfterVerification").forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName())));
     }
 

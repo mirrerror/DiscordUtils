@@ -44,7 +44,7 @@ public class Events implements Listener {
                         BotController.getTwoFactorPlayers().put(player, msg.getId());
                         return;
                     }
-                    player.sendMessage(Message.CAN_NOT_SEND_MESSAGE.getText(true));
+                    Message.CAN_NOT_SEND_MESSAGE.getFormattedText(true).forEach(player::sendMessage);
                 });
             }
             if(Main.getTwoFactorType() == Main.TwoFactorType.CODE) {
@@ -61,15 +61,13 @@ public class Events implements Listener {
                         BotController.getTwoFactorPlayers().put(player, FINAL_CODE);
                         return;
                     }
-                    player.sendMessage(Message.CAN_NOT_SEND_MESSAGE.getText(true));
+                    Message.CAN_NOT_SEND_MESSAGE.getFormattedText(true).forEach(player::sendMessage);
                 });
             }
         }
 
         if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.NotifyAboutDisabled2FA")) {
-            if(DiscordUtils.isVerified(player)) {
-                if(!DiscordUtils.hasTwoFactor(player)) player.sendMessage(Message.TWOFACTOR_DISABLED_REMINDER.getText(true));
-            }
+            if(!DiscordUtils.hasTwoFactor(player)) Message.TWOFACTOR_DISABLED_REMINDER.getFormattedText(true).forEach(player::sendMessage);
         }
     }
 
@@ -115,7 +113,7 @@ public class Events implements Listener {
             String message = event.getMessage();
             if(message.replace(" ", "").equals(BotController.getTwoFactorPlayers().get(player))) {
                 BotController.getTwoFactorPlayers().remove(player);
-                player.sendMessage(Message.TWOFACTOR_AUTHORIZED.getText(true));
+                Message.TWOFACTOR_AUTHORIZED.getFormattedText(true).forEach(player::sendMessage);
                 BotController.getSessions().put(player.getUniqueId(), StringUtils.remove(player.getAddress().getAddress().toString(), '/'));
             } else {
                 Bukkit.getScheduler().runTask(Main.getInstance(), () -> player.kickPlayer(Message.INVALID_TWOFACTOR_CODE.getText()));
@@ -153,11 +151,11 @@ public class Events implements Listener {
         Player player = event.getPlayer();
         if(BotController.getTwoFactorPlayers().containsKey(player)) {
             player.getInventory().addItem(event.getBrokenItem());
-            player.sendMessage(Message.TWOFACTOR_NEEDED.getText(true));
+            Message.TWOFACTOR_NEEDED.getFormattedText(true).forEach(player::sendMessage);
         }
         if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.ForceVerification") && !DiscordUtils.isVerified(player)) {
             player.getInventory().addItem(event.getBrokenItem());
-            player.sendMessage(Message.VERIFICATION_NEEDED.getText(true));
+            Message.VERIFICATION_NEEDED.getFormattedText(true).forEach(player::sendMessage);
         }
     }
 
@@ -182,7 +180,7 @@ public class Events implements Listener {
     private void checkTwoFactor(Player player, Cancellable event) {
         if(BotController.getTwoFactorPlayers().containsKey(player)) {
             event.setCancelled(true);
-            player.sendMessage(Message.TWOFACTOR_NEEDED.getText(true));
+            Message.TWOFACTOR_NEEDED.getFormattedText(true).forEach(player::sendMessage);
         }
     }
 
@@ -190,7 +188,7 @@ public class Events implements Listener {
         if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.ForceVerification")) {
             if(!DiscordUtils.isVerified(player)) {
                 event.setCancelled(true);
-                player.sendMessage(Message.VERIFICATION_NEEDED.getText(true));
+                Message.VERIFICATION_NEEDED.getFormattedText(true).forEach(player::sendMessage);
             }
         }
     }

@@ -16,6 +16,15 @@
 # Type - тип активности бота (доступные: default, streaming, listening, watching, competing)
 # Text - текст активности
 # ------------------------------------------------------------------
+# SuccessfulEmbedColor
+# Цвет embed-сообщений для сообщений типа successful
+# ------------------------------------------------------------------
+# InformationEmbedColor
+# Цвет embed-сообщений для сообщений типа information
+# ------------------------------------------------------------------
+# ErrorEmbedColor
+# Цвет embed-сообщений для сообщений типа error
+# ------------------------------------------------------------------
 # GroupRoles
 # Сюда вводим роли по следующему формату: id_роли: 'название_группы'
 # Пример: 905508941230915684: 'admin'
@@ -46,6 +55,9 @@
 # ------------------------------------------------------------------
 # CommandsAfterVerification
 # Команды, которые выполняются сразу после того, как игрок верифицирует свой аккаунт (%player% - плейсхолдер для получения ника игрока)
+# ------------------------------------------------------------------
+# CommandsAfterServerBoosting
+# Команды, которые выполняются сразу после того, как игрок бустит сервер в Discord (%player% - плейсхолдер для получения ника игрока, %user% - плейсхолдер для получения ник игрока в Discord)
 # ------------------------------------------------------------------
 # DelayedRolesCheck
 # Включить ли проверку ролей каждые Delay секунд (если выключить, то будет проверять только при выходе и входе игрока на сервер)
@@ -94,6 +106,9 @@ Discord:
     3:
       Type: 'watching'
       Text: 'DiscordUtils'
+  SuccessfulEmbedColor: '#0AAC00'
+  InformationEmbedColor: '#ECC846'
+  ErrorEmbedColor: '#A80000'
   GroupRoles: {}
   AdminRoles: []
   VerifiedRole:
@@ -105,6 +120,7 @@ Discord:
   NotifyAboutDisabled2FA: true
   ForceVerification: false
   CommandsAfterVerification: []
+  CommandsAfterServerBoosting: []
   DelayedRolesCheck:
     Enabled: true
     Delay: 30

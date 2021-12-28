@@ -12,6 +12,7 @@ import md.mirrerror.discordutils.events.Events;
 import md.mirrerror.discordutils.integrations.permissions.LuckPermsIntegration;
 import md.mirrerror.discordutils.integrations.permissions.PermissionsIntegration;
 import md.mirrerror.discordutils.integrations.permissions.VaultIntegration;
+import md.mirrerror.discordutils.integrations.placeholders.PAPIManager;
 import md.mirrerror.discordutils.metrics.Metrics;
 import md.mirrerror.discordutils.utils.UpdateChecker;
 import org.bukkit.Bukkit;
@@ -28,6 +29,7 @@ public final class Main extends JavaPlugin {
 
     private ConfigManager configManager;
     private ActivityManager activityManager;
+    private PAPIManager papiManager;
     private static PermissionsPlugin permissionsPlugin;
     private static TwoFactorType twoFactorType;
     private static DatabaseType databaseType;
@@ -66,6 +68,8 @@ public final class Main extends JavaPlugin {
         instance = this;
         configManager = new ConfigManager();
         activityManager = new ActivityManager();
+        getLogger().info("ActivityManager has been successfully enabled.");
+        papiManager = new PAPIManager();
         getLogger().info("Configuration files successfully loaded.");
         BotController.setupBot(configManager.getConfig().getString("Discord.BotToken"));
         checkOutForPermissionsPlugin();
@@ -84,7 +88,6 @@ public final class Main extends JavaPlugin {
         if(configManager.getConfig().getBoolean("CheckForUpdates")) {
             getLogger().info("Checking for updates...");
             UpdateChecker.checkForUpdates();
-            //UpdateChecker.downloadUpdate();
         }
     }
 
@@ -178,6 +181,10 @@ public final class Main extends JavaPlugin {
 
     public ActivityManager getActivityManager() {
         return activityManager;
+    }
+
+    public PAPIManager getPapiManager() {
+        return papiManager;
     }
 
     public static TwoFactorType getTwoFactorType() {

@@ -14,13 +14,13 @@ public class Unlink implements SubCommand {
     @Override
     public void onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(!(sender instanceof Player)) {
-            sender.sendMessage(Message.SENDER_IS_NOT_A_PLAYER.getText(true));
+            Message.SENDER_IS_NOT_A_PLAYER.getFormattedText(true).forEach(sender::sendMessage);
             return;
         }
 
         Player player = (Player) sender;
         if(!DiscordUtils.isVerified(player)) {
-            sender.sendMessage(Message.ACCOUNT_IS_NOT_VERIFIED.getText(true));
+            Message.ACCOUNT_IS_NOT_VERIFIED.getFormattedText(true).forEach(sender::sendMessage);
             return;
         }
 
@@ -36,10 +36,10 @@ public class Unlink implements SubCommand {
                         msg.addReaction("❎").queue();
                         return;
                     }
-                    player.sendMessage(Message.CAN_NOT_SEND_MESSAGE.getText(true));
+                    Message.CAN_NOT_SEND_MESSAGE.getFormattedText(true).forEach(sender::sendMessage);
                 });
 
-        sender.sendMessage(Message.ACCOUNT_UNLINK_REQUEST_SENT.getText(true));
+        Message.ACCOUNT_UNLINK_REQUEST_SENT.getFormattedText(true).forEach(sender::sendMessage);
     }
 
     @Override

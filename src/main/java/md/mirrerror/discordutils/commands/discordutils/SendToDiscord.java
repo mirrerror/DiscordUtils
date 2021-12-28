@@ -10,17 +10,16 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import java.awt.*;
-import java.lang.reflect.Field;
 
 public class SendToDiscord implements SubCommand {
     @Override
     public void onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(!Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.MessagesChannel.Enabled")) {
-            sender.sendMessage(Message.COMMAND_DISABLED.getText(true));
+            Message.COMMAND_DISABLED.getFormattedText(true).forEach(sender::sendMessage);
             return;
         }
         if(args.length < 3) {
-            sender.sendMessage(Message.DISCORDUTILS_SENDTODISCORD_USAGE.getText(true));
+            Message.DISCORDUTILS_SENDTODISCORD_USAGE.getFormattedText(true).forEach(sender::sendMessage);
             return;
         }
         long channelId = Main.getInstance().getConfigManager().getConfig().getLong("Discord.MessagesChannel.Id");
@@ -41,14 +40,13 @@ public class SendToDiscord implements SubCommand {
 
             Color color;
             try {
-                Field field = Class.forName("java.awt.Color").getField(args[1].toUpperCase());
-                color = (Color) field.get(null);
+                color = Color.decode(args[1]);
             } catch (Exception e) {
                 color = null;
             }
 
             if(color == null) {
-                sender.sendMessage(Message.INVALID_COLOR_VALUE.getText(true));
+                Message.INVALID_COLOR_VALUE.getFormattedText(true).forEach(sender::sendMessage);
                 return;
             }
 

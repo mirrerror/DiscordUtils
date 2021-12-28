@@ -34,7 +34,6 @@ public class BotController {
             try {
                 jda = JDABuilder.createDefault(token).build().awaitReady();
                 jda.addEventListener(new EventListener());
-                //new SlashCommandsManager();
                 setupGroupRoles();
                 setupAdminRoles();
                 setupRewardBlacklistedVoiceChannels();

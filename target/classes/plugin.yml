@@ -1,9 +1,10 @@
 name: DiscordUtils
-version: '2.2'
+version: '2.3'
 main: md.mirrerror.discordutils.Main
 softdepend:
   - 'Vault'
   - 'LuckPerms'
+  - 'PlaceholderAPI'
 commands:
   discordutils:
     usage: ''

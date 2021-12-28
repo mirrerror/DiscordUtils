@@ -23,13 +23,13 @@ public class VoiceInvite implements SubCommand {
     @Override
     public void onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(!(sender instanceof Player)) {
-            sender.sendMessage(Message.SENDER_IS_NOT_A_PLAYER.getText(true));
+            Message.SENDER_IS_NOT_A_PLAYER.getFormattedText(true).forEach(sender::sendMessage);
             return;
         }
 
         Player player = (Player) sender;
         if(!DiscordUtils.isVerified(player)) {
-            sender.sendMessage(Message.ACCOUNT_IS_NOT_VERIFIED.getText(true));
+            Message.ACCOUNT_IS_NOT_VERIFIED.getFormattedText(true).forEach(sender::sendMessage);
             return;
         }
 
@@ -39,7 +39,7 @@ public class VoiceInvite implements SubCommand {
                 Member member = guild.getMember(user);
                 if(member != null) {
                     if(member.getVoiceState().getChannel() == null) {
-                        player.sendMessage(Message.SENDER_IS_NOT_IN_A_VOICE_CHANNEL.getText(true));
+                        Message.SENDER_IS_NOT_IN_A_VOICE_CHANNEL.getFormattedText(true).forEach(sender::sendMessage);
                         return;
                     }
 
@@ -50,7 +50,7 @@ public class VoiceInvite implements SubCommand {
                     textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
                     textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Message.VOICE_INVITE_HOVER.getText(false)).create()));
 
-                    player.sendMessage(Message.VOICE_INVITE_SENT.getText(true));
+                    Message.VOICE_INVITE_SENT.getFormattedText(true).forEach(sender::sendMessage);
                     Bukkit.getOnlinePlayers().forEach(online -> online.spigot().sendMessage(textComponent));
                 }
             });

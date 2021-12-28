@@ -14,13 +14,13 @@ public class TwoFactor implements SubCommand {
     @Override
     public void onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(!(sender instanceof Player)) {
-            sender.sendMessage(Message.SENDER_IS_NOT_A_PLAYER.getText(true));
+            Message.SENDER_IS_NOT_A_PLAYER.getFormattedText(true).forEach(sender::sendMessage);
             return;
         }
 
         Player player = (Player) sender;
         if(!DiscordUtils.isVerified(player)) {
-            sender.sendMessage(Message.ACCOUNT_IS_NOT_VERIFIED.getText(true));
+            Message.ACCOUNT_IS_NOT_VERIFIED.getFormattedText(true).forEach(sender::sendMessage);
             return;
         }
 
@@ -33,7 +33,7 @@ public class TwoFactor implements SubCommand {
                 Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".2factor", false);
                 Main.getInstance().getConfigManager().saveConfigFiles();
             }
-            sender.sendMessage(Message.DISCORDUTILS_TWOFACTOR_SUCCESSFUL.getText(true) + Message.DISABLED.getText());
+            Message.DISCORDUTILS_TWOFACTOR_SUCCESSFUL.getFormattedText(true).forEach(msg -> sender.sendMessage(msg.replace("%status%", Message.DISABLED.getText())));
 
         } else {
 
@@ -44,7 +44,7 @@ public class TwoFactor implements SubCommand {
                 Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".2factor", true);
                 Main.getInstance().getConfigManager().saveConfigFiles();
             }
-            sender.sendMessage(Message.DISCORDUTILS_TWOFACTOR_SUCCESSFUL.getText(true) + Message.ENABLED.getText());
+            Message.DISCORDUTILS_TWOFACTOR_SUCCESSFUL.getFormattedText(true).forEach(msg -> sender.sendMessage(msg.replace("%status%", Message.ENABLED.getText())));
 
         }
     }

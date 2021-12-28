@@ -4,6 +4,8 @@ import md.mirrerror.discordutils.Main;
 import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public enum Message {
@@ -54,6 +56,7 @@ public enum Message {
     INFORMATION,
     SUCCESSFULLY,
     EMBED_FOOTER,
+    STATS_FORMAT,
     HELP;
 
     public String getText() {
@@ -79,6 +82,19 @@ public enum Message {
             }
         } else return this.getStringList();
         return stringList;
+    }
+
+    public List<String> getFormattedText() {
+        return parseNewLines(getText());
+    }
+
+    public List<String> getFormattedText(boolean addPrefix) {
+        return parseNewLines(getText(addPrefix));
+    }
+
+    private static List<String> parseNewLines(String s) {
+        String[] sArray = s.split("\n");
+        return new LinkedList<>(Arrays.asList(sArray));
     }
 
 }

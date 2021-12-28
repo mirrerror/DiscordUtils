@@ -4,8 +4,10 @@ import md.mirrerror.discordutils.Main;
 import md.mirrerror.discordutils.config.Message;
 import md.mirrerror.discordutils.database.DatabaseManager;
 import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateBoostTimeEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -13,14 +15,15 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.lang.reflect.Field;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 public class EventListener extends ListenerAdapter {
 
@@ -95,8 +98,7 @@ public class EventListener extends ListenerAdapter {
 
                 Color color;
                 try {
-                    Field field = Class.forName("java.awt.Color").getField(args[2].toUpperCase());
-                    color = (Color) field.get(null);
+                    color = Color.decode(args[2]);
                 } catch (Exception e) {
                     color = null;
                 }
@@ -108,6 +110,30 @@ public class EventListener extends ListenerAdapter {
 
                 event.getChannel().sendMessageEmbeds(embedManager.embed(args[1], text, color, Message.EMBED_SENT_BY.getText().replace("%sender%",
                         event.getAuthor().getAsTag()))).queue();
+                break;
+            }
+            case "stats": {
+                if(!DiscordUtils.isVerified(event.getAuthor())) {
+                    event.getChannel().sendMessageEmbeds(embedManager.errorEmbed(Message.ACCOUNT_IS_NOT_VERIFIED.getText())).queue();
+                    return;
+                }
+
+                String messageToSend = "";
+                for (String s : Message.STATS_FORMAT.getStringList()) {
+                    messageToSend += s + "\n";
+                }
+
+
+                Player player = DiscordUtils.getPlayer(event.getAuthor());
+                if(player != null) {
+                    messageToSend = Main.getInstance().getPapiManager().setPlaceholders(player, messageToSend);
+                } else {
+                    OfflinePlayer offlinePlayer = DiscordUtils.getOfflinePlayer(event.getAuthor());
+                    messageToSend = Main.getInstance().getPapiManager().setPlaceholders(offlinePlayer, messageToSend);
+                }
+
+                event.getChannel().sendMessageEmbeds(embedManager.infoEmbed(messageToSend)).queue();
+                break;
             }
         }
     }
@@ -196,6 +222,27 @@ public class EventListener extends ListenerAdapter {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                             Main.getInstance().getConfigManager().getConfig().getString("Discord.GuildVoiceRewards.Reward")
                                     .replace("%player%", DiscordUtils.getOfflinePlayer(user).getName())));
+        }
+    }
+
+    @Override
+    public void onGuildMemberUpdateBoostTime(@NotNull GuildMemberUpdateBoostTimeEvent event) {
+        OffsetDateTime newTime = event.getNewTimeBoosted();
+        OffsetDateTime oldTime = event.getOldTimeBoosted();
+        if(newTime == null || oldTime == null) {
+            Main.getInstance().getLogger().severe("An error occurred while handling the GuildMemberUpdateBoostTimeEvent! Please, contact the developer!");
+            return;
+        }
+
+        if(newTime.isAfter(oldTime)) {
+            Member member = event.getEntity();
+            User user = member.getUser();
+            if(DiscordUtils.isVerified(user)) return;
+
+            Main.getInstance().getConfigManager().getConfig().getStringList("Discord.CommandsAfterServerBoosting").forEach(command -> {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", DiscordUtils.getOfflinePlayer(user).getName()).replace("%user%", user.getAsTag()));
+            });
+
         }
     }
 
