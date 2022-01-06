@@ -37,14 +37,16 @@ public class BotController {
                 setupGroupRoles();
                 setupAdminRoles();
                 setupRewardBlacklistedVoiceChannels();
-                setupActivityChanger();
+                if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.Activities.Enabled")) {
+                    setupActivityChanger();
+                }
                 if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.DelayedRolesCheck.Enabled")) {
                     DiscordUtils.setupDelayedRolesCheck();
                 }
                 if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.DelayedNamesCheck.Enabled")) {
                     DiscordUtils.setupDelayedNamesCheck();
                 }
-                Main.getInstance().getLogger().info("Bot successfully loaded.");
+                Main.getInstance().getLogger().info("Bot has been successfully loaded.");
             } catch (LoginException | InterruptedException e) {
                 Main.getInstance().getLogger().severe("Something went wrong while setting up the bot!");
                 Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");

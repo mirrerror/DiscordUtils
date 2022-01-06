@@ -20,6 +20,8 @@ public class LuckPermsIntegration implements PermissionsIntegration {
         try {
             LuckPerms api = LuckPermsProvider.get();
             User user = api.getUserManager().getUser(player.getUniqueId());
+            if(user == null) user = api.getUserManager().loadUser(player.getUniqueId()).join();
+
             if(user != null) {
                 Collection<Group> inheritedGroups = user.getInheritedGroups(user.getQueryOptions());
                 for(Group group : inheritedGroups) {
@@ -38,6 +40,8 @@ public class LuckPermsIntegration implements PermissionsIntegration {
         try {
             LuckPerms api = LuckPermsProvider.get();
             User user = api.getUserManager().getUser(offlinePlayer.getUniqueId());
+            if(user == null) user = api.getUserManager().loadUser(offlinePlayer.getUniqueId()).join();
+
             if(user != null) {
                 Collection<Group> inheritedGroups = user.getInheritedGroups(user.getQueryOptions());
                 for(Group group : inheritedGroups) {

@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -27,12 +28,15 @@ import java.time.OffsetDateTime;
 
 public class EventListener extends ListenerAdapter {
 
+    private final BotController botController = new BotController();
+    private final EmbedManager embedManager = new EmbedManager();
+
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         if(event.getAuthor().isBot() || event.isWebhookMessage()) return;
-        if(!event.getMessage().getContentRaw().startsWith(new BotController().getBotPrefix())) return;
-        String[] args = event.getMessage().getContentRaw().replaceFirst(new BotController().getBotPrefix(), "").split(" ");
-        EmbedManager embedManager = new EmbedManager();
+        if(!event.getMessage().getContentRaw().startsWith(botController.getBotPrefix())) return;
+        String[] args = event.getMessage().getContentRaw().replaceFirst(botController.getBotPrefix(), "").split(" ");
+
         switch (args[0]) {
             case "link": {
                 if(DiscordUtils.isVerified(event.getAuthor())) {
@@ -162,16 +166,24 @@ public class EventListener extends ListenerAdapter {
                         if(roleId > 0) {
                             BotController.getJda().getGuilds().forEach(guild -> {
                                 Role verifiedRole = DiscordUtils.getVerifiedRole(guild);
-                                if(verifiedRole != null) guild.removeRoleFromMember(guild.retrieveMember(DiscordUtils.getDiscordUser(player)).complete(), verifiedRole).queue();
+                                Member member = null;
+
+                                try {
+                                    member = guild.retrieveMember(event.getUser()).complete();
+                                } catch (ErrorResponseException exception) {
+                                    if(exception.getErrorCode() != DiscordUtils.UNKNOWN_MEMBER_EXCEPTION) exception.printStackTrace();
+                                }
+
+                                if(verifiedRole != null && member != null) guild.removeRoleFromMember(member, verifiedRole).queue();
                             });
                         }
                     }
                     BotController.getUnlinkPlayers().remove(player);
-                    player.sendMessage(Message.ACCOUNT_SUCCESSFULLY_UNLINKED.getText(true));
+                    Message.ACCOUNT_SUCCESSFULLY_UNLINKED.getFormattedText(true).forEach(player::sendMessage);
                 }
                 if(event.getReaction().getReactionEmote().getName().equals("❎")) {
                     BotController.getUnlinkPlayers().remove(player);
-                    player.sendMessage(Message.ACCOUNT_UNLINK_CANCELLED.getText(true));
+                    Message.ACCOUNT_UNLINK_CANCELLED.getFormattedText(true).forEach(player::sendMessage);
                 }
 
                 event.getChannel().deleteMessageById(event.getMessageId()).queue();
@@ -218,10 +230,10 @@ public class EventListener extends ListenerAdapter {
             long difference = Duration.between(BotController.getVoiceTime().get(user), localDateTime).getSeconds();
             long multiplier = Math.round(difference/Main.getInstance().getConfigManager().getConfig().getDouble("Discord.GuildVoiceRewards.Time"));
             BotController.getVoiceTime().remove(user);
-            for (long i = 0; i < multiplier; i++) Bukkit.getScheduler().callSyncMethod(Main.getInstance(), () ->
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                            Main.getInstance().getConfigManager().getConfig().getString("Discord.GuildVoiceRewards.Reward")
-                                    .replace("%player%", DiscordUtils.getOfflinePlayer(user).getName())));
+
+            String command = Main.getInstance().getConfigManager().getConfig().getString("Discord.GuildVoiceRewards.Reward")
+                    .replace("%player%", DiscordUtils.getOfflinePlayer(user).getName());
+            for (long i = 0; i < multiplier; i++) Bukkit.getScheduler().callSyncMethod(Main.getInstance(), () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
         }
     }
 
@@ -239,8 +251,9 @@ public class EventListener extends ListenerAdapter {
             User user = member.getUser();
             if(DiscordUtils.isVerified(user)) return;
 
+            OfflinePlayer offlinePlayer = DiscordUtils.getOfflinePlayer(user);
             Main.getInstance().getConfigManager().getConfig().getStringList("Discord.CommandsAfterServerBoosting").forEach(command -> {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", DiscordUtils.getOfflinePlayer(user).getName()).replace("%user%", user.getAsTag()));
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", offlinePlayer.getName()).replace("%user%", user.getAsTag()));
             });
 
         }

@@ -3,7 +3,6 @@ package md.mirrerror.discordutils.commands.discordutils;
 import md.mirrerror.discordutils.Main;
 import md.mirrerror.discordutils.commands.SubCommand;
 import md.mirrerror.discordutils.config.Message;
-import md.mirrerror.discordutils.database.DatabaseManager;
 import md.mirrerror.discordutils.discord.BotController;
 import md.mirrerror.discordutils.discord.DiscordUtils;
 import net.dv8tion.jda.api.entities.Role;
@@ -36,8 +35,7 @@ public class Link implements SubCommand {
         }
 
         if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
-            DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
-            databaseManager.registerPlayer(player.getUniqueId(), Long.parseLong(BotController.getLinkCodes().get(args[0]).getId()), false);
+            Main.getDatabaseType().getDatabaseManager().registerPlayer(player.getUniqueId(), Long.parseLong(BotController.getLinkCodes().get(args[0]).getId()), false);
         } else {
             Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".userId", "" + BotController.getLinkCodes().get(args[0]).getId());
 

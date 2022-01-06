@@ -33,7 +33,6 @@ public class SendToDiscord implements SubCommand {
                 Main.getInstance().getLogger().severe("The plugin is trying to send a message to a null TextChannel (id: " + channelId + "). Check your config.yml.");
                 return;
             }
-            EmbedManager embedManager = new EmbedManager();
             String text = "";
             for(int i = 2; i < args.length; i++) text += args[i] + " ";
             text = text.trim();
@@ -50,7 +49,7 @@ public class SendToDiscord implements SubCommand {
                 return;
             }
 
-            textChannel.sendMessageEmbeds(embedManager.embed(args[0], text, color, Message.SENDTODISCORD_SENT_BY.getText().replace("%sender%", sender.getName()))).queue();
+            textChannel.sendMessageEmbeds(new EmbedManager().embed(args[0], text, color, Message.SENDTODISCORD_SENT_BY.getText().replace("%sender%", sender.getName()))).queue();
         });
     }
 

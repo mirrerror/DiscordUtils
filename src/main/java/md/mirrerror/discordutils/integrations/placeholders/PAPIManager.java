@@ -15,7 +15,7 @@ public class PAPIManager {
         if(!isEnabled) {
             Main.getInstance().getLogger().warning("It seems like you don't have PlaceholderAPI installed on your server. Disabling PAPIManager...");
         } else {
-            Main.getInstance().getLogger().warning("PAPIManager has been successfully enabled.");
+            Main.getInstance().getLogger().info("PAPIManager has been successfully enabled.");
         }
     }
 

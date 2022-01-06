@@ -67,24 +67,24 @@ public final class Main extends JavaPlugin {
         // Plugin startup logic
         instance = this;
         configManager = new ConfigManager();
+        papiManager = new PAPIManager();
         activityManager = new ActivityManager();
         getLogger().info("ActivityManager has been successfully enabled.");
-        papiManager = new PAPIManager();
-        getLogger().info("Configuration files successfully loaded.");
+        getLogger().info("Configuration files have been successfully loaded.");
         BotController.setupBot(configManager.getConfig().getString("Discord.BotToken"));
         checkOutForPermissionsPlugin();
         if(permissionsPlugin != PermissionsPlugin.NONE) getLogger().info("Successfully integrated with " + permissionsPlugin.name() + ".");
-        else getLogger().info("You chose no permission plugin or it is not supported. Disabling this feature.");
+        else getLogger().info("You chose no permission plugin or it is not supported. Disabling this feature...");
         registerCommands();
-        getLogger().info("Commands successfully loaded.");
+        getLogger().info("Commands have been successfully loaded.");
         Bukkit.getPluginManager().registerEvents(new Events(), this);
-        getLogger().info("Events successfully loaded.");
+        getLogger().info("Events have been successfully loaded.");
         setupTwoFactorType();
-        getLogger().info("2FA successfully loaded.");
+        getLogger().info("2FA has been successfully loaded.");
         setupDatabaseType();
-        getLogger().info("DatabaseManager successfully loaded.");
+        getLogger().info("DatabaseManager has been successfully loaded.");
         setupMetrics();
-        getLogger().info("Metrics successfully loaded.");
+        getLogger().info("Metrics has been successfully loaded.");
         if(configManager.getConfig().getBoolean("CheckForUpdates")) {
             getLogger().info("Checking for updates...");
             UpdateChecker.checkForUpdates();
@@ -95,7 +95,7 @@ public final class Main extends JavaPlugin {
     public void onDisable() {
         // Plugin shutdown logic
         //Bukkit.getScheduler().getPendingTasks().forEach(BukkitTask::cancel);
-        //BotController.getJda().shutdownNow();
+        BotController.getJda().shutdownNow();
     }
 
     private void checkOutForPermissionsPlugin() {

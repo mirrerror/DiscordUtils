@@ -26,9 +26,8 @@ public class Unlink implements SubCommand {
 
         String playerIp = StringUtils.remove(player.getAddress().getAddress().toString(), '/');
 
-        EmbedManager embedManager = new EmbedManager();
         DiscordUtils.getDiscordUser(player).openPrivateChannel().submit()
-                .thenCompose(channel -> channel.sendMessageEmbeds(embedManager.infoEmbed(Message.ACCOUNT_UNLINK_CONFIRMATION.getText().replace("%playerIp%", playerIp))).submit())
+                .thenCompose(channel -> channel.sendMessageEmbeds(new EmbedManager().infoEmbed(Message.ACCOUNT_UNLINK_CONFIRMATION.getText().replace("%playerIp%", playerIp))).submit())
                 .whenComplete((msg, error) -> {
                     if (error == null) {
                         BotController.getUnlinkPlayers().put(player, msg);

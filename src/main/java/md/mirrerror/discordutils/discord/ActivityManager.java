@@ -27,7 +27,7 @@ public class ActivityManager {
     private static List<Activity> getActivitiesFromConfig() {
         final List<Activity> botActivities = new LinkedList<>();
         Main.getInstance().getConfigManager().getConfig().getConfigurationSection("Discord.Activities").getKeys(false).forEach(activity -> {
-            if(!activity.equals("UpdateDelay")) {
+            if(!activity.equals("UpdateDelay") && !activity.equals("Enabled")) {
                 Activity.ActivityType activityType = Activity.ActivityType.valueOf(Main.getInstance().getConfigManager().getConfig().getString("Discord.Activities." + activity + ".Type").toUpperCase());
                 String activityText = Main.getInstance().getConfigManager().getConfig().getString("Discord.Activities." + activity + ".Text");
                 botActivities.add(Activity.of(activityType, activityText));

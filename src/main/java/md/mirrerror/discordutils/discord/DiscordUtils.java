@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import net.dv8tion.jda.api.exceptions.HierarchyException;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -15,12 +16,15 @@ import org.bukkit.entity.Player;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class DiscordUtils {
 
+    private static final DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
+    public static final int UNKNOWN_MEMBER_EXCEPTION = 10007;
+
     public static boolean isVerified(Player player) {
         if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
-            DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
             return databaseManager.playerExists(player.getUniqueId());
         }
         return Main.getInstance().getConfigManager().getData().getConfigurationSection("DiscordLink").contains(player.getUniqueId().toString());
@@ -28,7 +32,6 @@ public class DiscordUtils {
 
     public static boolean isVerified(OfflinePlayer offlinePlayer) {
         if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
-            DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
             return databaseManager.playerExists(offlinePlayer.getUniqueId());
         }
         return Main.getInstance().getConfigManager().getData().getConfigurationSection("DiscordLink").contains(offlinePlayer.getUniqueId().toString());
@@ -36,7 +39,6 @@ public class DiscordUtils {
 
     public static boolean isVerified(User user) {
         if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
-            DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
             return databaseManager.userLinked(user.getIdLong());
         }
         for(String s : Main.getInstance().getConfigManager().getData().getConfigurationSection("DiscordLink").getKeys(false)) {
@@ -46,17 +48,37 @@ public class DiscordUtils {
     }
 
     public static User getDiscordUser(Player player) {
+        User user = null;
         if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
-            DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
-            return BotController.getJda().retrieveUserById(databaseManager.getUserId(player.getUniqueId())).complete();
+
+            try {
+                user = BotController.getJda().retrieveUserById(databaseManager.getUserId(player.getUniqueId())).complete();
+            } catch (ErrorResponseException exception) {
+                if(exception.getErrorCode() != UNKNOWN_MEMBER_EXCEPTION) exception.printStackTrace();
+            }
+
+            return user;
         }
-        return BotController.getJda().retrieveUserById(Main.getInstance().getConfigManager().getData().getString("DiscordLink." + player.getUniqueId().toString() + ".userId")).complete();
+
+        try {
+            user = BotController.getJda().retrieveUserById(Main.getInstance().getConfigManager().getData().getString("DiscordLink." + player.getUniqueId().toString() + ".userId")).complete();
+        } catch (ErrorResponseException exception) {
+            if(exception.getErrorCode() != UNKNOWN_MEMBER_EXCEPTION) exception.printStackTrace();
+        }
+        return user;
     }
 
     public static User getDiscordUser(OfflinePlayer offlinePlayer) {
         if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
-            DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
-            return BotController.getJda().retrieveUserById(databaseManager.getUserId(offlinePlayer.getUniqueId())).complete();
+            User user = null;
+
+            try {
+                user = BotController.getJda().retrieveUserById(databaseManager.getUserId(offlinePlayer.getUniqueId())).complete();
+            } catch (ErrorResponseException exception) {
+                if(exception.getErrorCode() != UNKNOWN_MEMBER_EXCEPTION) exception.printStackTrace();
+            }
+
+            return user;
         }
         return BotController.getJda().retrieveUserById(Main.getInstance().getConfigManager().getData().getString("DiscordLink." + offlinePlayer.getUniqueId().toString() + ".userId")).complete();
     }
@@ -64,7 +86,6 @@ public class DiscordUtils {
     public static OfflinePlayer getOfflinePlayer(User user) {
         if(isVerified(user)) {
             if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
-                DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
                 return Bukkit.getOfflinePlayer(databaseManager.getPlayer(user.getIdLong()));
             }
 
@@ -79,7 +100,6 @@ public class DiscordUtils {
     public static Player getPlayer(User user) {
         if(isVerified(user)) {
             if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
-                DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
                 return Bukkit.getPlayer(databaseManager.getPlayer(user.getIdLong()));
             }
 
@@ -93,7 +113,6 @@ public class DiscordUtils {
 
     public static boolean hasTwoFactor(Player player) {
         if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
-            DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
             return databaseManager.hasTwoFactor(player.getUniqueId());
         }
         return Main.getInstance().getConfigManager().getData().getBoolean("DiscordLink." + player.getUniqueId() + ".2factor");
@@ -101,7 +120,6 @@ public class DiscordUtils {
 
     public static boolean hasTwoFactor(User user) {
         if(Main.getDatabaseType() != Main.DatabaseType.NONE) {
-            DatabaseManager databaseManager = Main.getDatabaseType().getDatabaseManager();
             return databaseManager.hasTwoFactor(databaseManager.getPlayer(user.getIdLong()));
         }
 
@@ -113,18 +131,32 @@ public class DiscordUtils {
     }
 
     public static boolean isAdmin(User user) {
+        Member member = null;
         for(Guild guild : BotController.getJda().getGuilds()) {
             for(long role : BotController.getAdminRoles()) {
-                if(guild.retrieveMember(user).complete().getRoles().contains(guild.getRoleById(role))) return true;
+                try {
+                    member = guild.retrieveMember(user).complete();
+                } catch (ErrorResponseException exception) {
+                    if(exception.getErrorCode() != UNKNOWN_MEMBER_EXCEPTION) exception.printStackTrace();
+                }
+
+                if(member != null) if(member.getRoles().contains(guild.getRoleById(role))) return true;
             }
         }
         return false;
     }
 
     public static boolean isAdmin(Player player) {
+        Member member = null;
         for(Guild guild : BotController.getJda().getGuilds()) {
             for(long role : BotController.getAdminRoles()) {
-                if(guild.retrieveMember(getDiscordUser(player)).complete().getRoles().contains(guild.getRoleById(role))) return true;
+                try {
+                    member = guild.retrieveMember(getDiscordUser(player)).complete();
+                } catch (ErrorResponseException exception) {
+                    if(exception.getErrorCode() != UNKNOWN_MEMBER_EXCEPTION) exception.printStackTrace();
+                }
+
+                if(member != null) if(member.getRoles().contains(guild.getRoleById(role))) return true;
             }
         }
         return false;
@@ -143,30 +175,44 @@ public class DiscordUtils {
         List<String> groups = permissionsIntegration.getUserGroups(offlinePlayer);
         Map<Long, String> groupRoles = BotController.getGroupRoles();
 
+        User user = DiscordUtils.getDiscordUser(offlinePlayer);
+        AtomicReference<Member> member = new AtomicReference<>();
+
         for(Long roleId : groupRoles.keySet()) {
             String group = groupRoles.get(roleId);
             Role role = BotController.getJda().getRoleById(roleId);
             if(groups.contains(group)) {
                 BotController.getJda().getGuilds().forEach(guild -> {
-                    User user = DiscordUtils.getDiscordUser(offlinePlayer);
-                    Member member = guild.retrieveMember(user).complete();
-                    if(member != null) {
-                        if(!guild.getMember(BotController.getJda().getSelfUser()).canInteract(member)) return;
-                        if(role != null) guild.addRoleToMember(guild.retrieveMember(user).complete(), role).queue();
+
+                    try {
+                        member.set(guild.retrieveMember(user).complete());
+                    } catch (ErrorResponseException exception) {
+                        if(exception.getErrorCode() != UNKNOWN_MEMBER_EXCEPTION) exception.printStackTrace();
+                    }
+
+                    if(member.get() != null) {
+                        try {
+                            if(role != null) guild.addRoleToMember(member.get(), role).queue();
+                        } catch (HierarchyException exception) {
+                            Main.getInstance().getLogger().warning("Couldn't assign a role for member: " + user.getAsTag() + ". The bot probably doesn't have the needed permissions.");
+                        }
                     }
                 });
             } else {
                 BotController.getJda().getGuilds().forEach(guild -> {
-                    User user = DiscordUtils.getDiscordUser(offlinePlayer);
-                    Member member = null;
+
                     try {
-                        member = guild.retrieveMember(user).complete();
+                        member.set(guild.retrieveMember(user).complete());
                     } catch (ErrorResponseException exception) {
-                        if(exception.getErrorCode() != 10007) exception.printStackTrace();
+                        if(exception.getErrorCode() != UNKNOWN_MEMBER_EXCEPTION) exception.printStackTrace();
                     }
-                    if(member != null) {
-                        if(!guild.getMember(BotController.getJda().getSelfUser()).canInteract(member)) return;
-                        if(role != null) guild.removeRoleFromMember(guild.retrieveMember(user).complete(), role).queue();
+
+                    if(member.get() != null) {
+                        try {
+                            if(role != null) guild.removeRoleFromMember(member.get(), role).queue();
+                        } catch (HierarchyException exception) {
+                            Main.getInstance().getLogger().warning("Couldn't assign a role for member: " + user.getAsTag() + ". The bot probably doesn't have the needed permissions.");
+                        }
                     }
                 });
             }
@@ -179,10 +225,11 @@ public class DiscordUtils {
         BotController.getJda().getGuilds().forEach(guild -> {
             User user = DiscordUtils.getDiscordUser(offlinePlayer);
             Member member = null;
+
             try {
                 member = guild.retrieveMember(user).complete();
             } catch (ErrorResponseException exception) {
-                if(exception.getErrorCode() != 10007) exception.printStackTrace();
+                if(exception.getErrorCode() != UNKNOWN_MEMBER_EXCEPTION) exception.printStackTrace();
             }
             if(member != null) {
                 if(!guild.getMember(BotController.getJda().getSelfUser()).canInteract(member)) return;
