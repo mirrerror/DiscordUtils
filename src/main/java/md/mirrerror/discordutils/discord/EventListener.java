@@ -25,6 +25,8 @@ import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EventListener extends ListenerAdapter {
 
@@ -35,6 +37,10 @@ public class EventListener extends ListenerAdapter {
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         if(event.getAuthor().isBot() || event.isWebhookMessage()) return;
         if(!event.getMessage().getContentRaw().startsWith(botController.getBotPrefix())) return;
+        List<Long> botCommandTextChannels = Main.getInstance().getConfigManager().getConfig().getLongList("Discord.BotCommandTextChannels");
+        if(!botCommandTextChannels.isEmpty()) {
+            if(!Main.getInstance().getConfigManager().getConfig().getLongList("Discord.BotCommandTextChannels").contains(event.getChannel().getIdLong())) return;
+        }
         String[] args = event.getMessage().getContentRaw().replaceFirst(botController.getBotPrefix(), "").split(" ");
 
         switch (args[0]) {
@@ -196,7 +202,8 @@ public class EventListener extends ListenerAdapter {
                 if(event.getReaction().getReactionEmote().getName().equals("✅")) {
                     BotController.getTwoFactorPlayers().remove(player);
                     player.sendMessage(Message.TWOFACTOR_AUTHORIZED.getText(true));
-                    BotController.getSessions().put(player.getUniqueId(), StringUtils.remove(player.getAddress().getAddress().toString(), '/'));
+                    BotController.getSessions().put(player.getUniqueId(), new TwoFactorSession(StringUtils.remove(player.getAddress().getAddress().toString(), '/'),
+                            LocalDateTime.now().plusSeconds(Main.getInstance().getConfigManager().getConfig().getLong("Discord.2FASessionTime"))));
                 }
                 if(event.getReaction().getReactionEmote().getName().equals("❎")) {
                     BotController.getTwoFactorPlayers().remove(player);

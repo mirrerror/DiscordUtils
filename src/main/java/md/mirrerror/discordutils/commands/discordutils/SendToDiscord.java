@@ -49,7 +49,7 @@ public class SendToDiscord implements SubCommand {
                 return;
             }
 
-            textChannel.sendMessageEmbeds(new EmbedManager().embed(args[0], text, color, Message.SENDTODISCORD_SENT_BY.getText().replace("%sender%", sender.getName()))).queue();
+            textChannel.sendMessageEmbeds(new EmbedManager().embed(args[0], text.replace("\\n", "\n"), color, Message.SENDTODISCORD_SENT_BY.getText().replace("%sender%", sender.getName()))).queue();
         });
     }
 

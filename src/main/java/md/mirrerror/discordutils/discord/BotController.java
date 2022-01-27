@@ -23,35 +23,34 @@ public class BotController {
 
     private static Map<String, User> linkCodes = new HashMap<>();
     private static Map<Player, String> twoFactorPlayers = new HashMap<>();
-    private static Map<UUID, String> sessions = new HashMap<>();
+    private static Map<String, Integer> twoFactorAttempts = new HashMap<>(); // ip, attempts
+    private static Map<UUID, TwoFactorSession> sessions = new HashMap<>();
     private static Map<User, LocalDateTime> voiceTime = new HashMap<>();
     private static Map<Player, Message> unlinkPlayers = new HashMap<>();
 
     private static List<Long> rewardBlacklistedVoiceChannels = new ArrayList<>();
 
     public static void setupBot(String token) {
-        Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
-            try {
-                jda = JDABuilder.createDefault(token).build().awaitReady();
-                jda.addEventListener(new EventListener());
-                setupGroupRoles();
-                setupAdminRoles();
-                setupRewardBlacklistedVoiceChannels();
-                if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.Activities.Enabled")) {
-                    setupActivityChanger();
-                }
-                if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.DelayedRolesCheck.Enabled")) {
-                    DiscordUtils.setupDelayedRolesCheck();
-                }
-                if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.DelayedNamesCheck.Enabled")) {
-                    DiscordUtils.setupDelayedNamesCheck();
-                }
-                Main.getInstance().getLogger().info("Bot has been successfully loaded.");
-            } catch (LoginException | InterruptedException e) {
-                Main.getInstance().getLogger().severe("Something went wrong while setting up the bot!");
-                Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
+        try {
+            jda = JDABuilder.createDefault(token).build().awaitReady();
+            jda.addEventListener(new EventListener());
+            setupGroupRoles();
+            setupAdminRoles();
+            setupRewardBlacklistedVoiceChannels();
+            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.Activities.Enabled")) {
+                setupActivityChanger();
             }
-        });
+            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.DelayedRolesCheck.Enabled")) {
+                DiscordUtils.setupDelayedRolesCheck();
+            }
+            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.DelayedNamesCheck.Enabled")) {
+                DiscordUtils.setupDelayedNamesCheck();
+            }
+            Main.getInstance().getLogger().info("Bot has been successfully loaded.");
+        } catch (LoginException | InterruptedException e) {
+            Main.getInstance().getLogger().severe("Something went wrong while setting up the bot!");
+            Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
+        }
     }
 
     public static void setupGroupRoles() {
@@ -103,7 +102,7 @@ public class BotController {
         return adminRoles;
     }
 
-    public static Map<UUID, String> getSessions() {
+    public static Map<UUID, TwoFactorSession> getSessions() {
         return sessions;
     }
 
@@ -117,5 +116,9 @@ public class BotController {
 
     public static Map<Player, Message> getUnlinkPlayers() {
         return unlinkPlayers;
+    }
+
+    public static Map<String, Integer> getTwoFactorAttempts() {
+        return twoFactorAttempts;
     }
 }

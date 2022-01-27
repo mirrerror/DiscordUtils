@@ -2,7 +2,7 @@ package md.mirrerror.discordutils.discord;
 
 import md.mirrerror.discordutils.Main;
 import md.mirrerror.discordutils.database.DatabaseManager;
-import md.mirrerror.discordutils.integrations.permissions.PermissionsIntegration;
+import md.mirrerror.discordutils.utils.integrations.permissions.PermissionsIntegration;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -80,7 +80,11 @@ public class DiscordUtils {
 
             return user;
         }
-        return BotController.getJda().retrieveUserById(Main.getInstance().getConfigManager().getData().getString("DiscordLink." + offlinePlayer.getUniqueId().toString() + ".userId")).complete();
+
+        String id = Main.getInstance().getConfigManager().getData().getString("DiscordLink." + offlinePlayer.getUniqueId().toString() + ".userId");
+        if(id != null) {
+            return BotController.getJda().retrieveUserById(Main.getInstance().getConfigManager().getData().getString("DiscordLink." + offlinePlayer.getUniqueId().toString() + ".userId")).complete();
+        } else return null;
     }
 
     public static OfflinePlayer getOfflinePlayer(User user) {

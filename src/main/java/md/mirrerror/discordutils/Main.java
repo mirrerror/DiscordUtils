@@ -9,10 +9,10 @@ import md.mirrerror.discordutils.database.MySQLManager;
 import md.mirrerror.discordutils.discord.ActivityManager;
 import md.mirrerror.discordutils.discord.BotController;
 import md.mirrerror.discordutils.events.Events;
-import md.mirrerror.discordutils.integrations.permissions.LuckPermsIntegration;
-import md.mirrerror.discordutils.integrations.permissions.PermissionsIntegration;
-import md.mirrerror.discordutils.integrations.permissions.VaultIntegration;
-import md.mirrerror.discordutils.integrations.placeholders.PAPIManager;
+import md.mirrerror.discordutils.utils.integrations.permissions.LuckPermsIntegration;
+import md.mirrerror.discordutils.utils.integrations.permissions.PermissionsIntegration;
+import md.mirrerror.discordutils.utils.integrations.permissions.VaultIntegration;
+import md.mirrerror.discordutils.utils.integrations.placeholders.PAPIManager;
 import md.mirrerror.discordutils.metrics.Metrics;
 import md.mirrerror.discordutils.utils.UpdateChecker;
 import org.bukkit.Bukkit;
@@ -71,7 +71,11 @@ public final class Main extends JavaPlugin {
         activityManager = new ActivityManager();
         getLogger().info("ActivityManager has been successfully enabled.");
         getLogger().info("Configuration files have been successfully loaded.");
-        BotController.setupBot(configManager.getConfig().getString("Discord.BotToken"));
+        if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.AsyncBotLoading")) {
+            Bukkit.getScheduler().runTaskAsynchronously(this, () -> BotController.setupBot(configManager.getConfig().getString("Discord.BotToken")));
+        } else {
+            BotController.setupBot(configManager.getConfig().getString("Discord.BotToken"));
+        }
         checkOutForPermissionsPlugin();
         if(permissionsPlugin != PermissionsPlugin.NONE) getLogger().info("Successfully integrated with " + permissionsPlugin.name() + ".");
         else getLogger().info("You chose no permission plugin or it is not supported. Disabling this feature...");
@@ -164,6 +168,7 @@ public final class Main extends JavaPlugin {
         subCommands.add(new SendToDiscord());
         subCommands.add(new VoiceInvite());
         subCommands.add(new Unlink());
+        subCommands.add(new GetDiscord());
         commandManager.registerCommand("discordutils", subCommands);
     }
 
