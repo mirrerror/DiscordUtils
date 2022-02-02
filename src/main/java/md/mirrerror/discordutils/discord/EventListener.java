@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -25,7 +24,6 @@ import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class EventListener extends ListenerAdapter {
@@ -76,7 +74,7 @@ public class EventListener extends ListenerAdapter {
                 break;
             }
             case "sudo": {
-                if(!DiscordUtils.isAdmin(event.getAuthor())) {
+                if(!DiscordUtils.isAdmin(event.getMember())) {
                     event.getChannel().sendMessageEmbeds(embedManager.errorEmbed(Message.INSUFFICIENT_PERMISSIONS.getText())).queue();
                     return;
                 }
@@ -94,7 +92,7 @@ public class EventListener extends ListenerAdapter {
                 break;
             }
             case "embed": {
-                if(!DiscordUtils.isAdmin(event.getAuthor())) {
+                if(!DiscordUtils.isAdmin(event.getMember())) {
                     event.getChannel().sendMessageEmbeds(embedManager.errorEmbed(Message.INSUFFICIENT_PERMISSIONS.getText())).queue();
                     return;
                 }
@@ -174,11 +172,13 @@ public class EventListener extends ListenerAdapter {
                                 Role verifiedRole = DiscordUtils.getVerifiedRole(guild);
                                 Member member = null;
 
-                                try {
+                                if(guild.isMember(event.getUser())) member = guild.getMember(event.getUser());
+
+                                /*try {
                                     member = guild.retrieveMember(event.getUser()).complete();
                                 } catch (ErrorResponseException exception) {
                                     if(exception.getErrorCode() != DiscordUtils.UNKNOWN_MEMBER_EXCEPTION) exception.printStackTrace();
-                                }
+                                }*/
 
                                 if(verifiedRole != null && member != null) guild.removeRoleFromMember(member, verifiedRole).queue();
                             });

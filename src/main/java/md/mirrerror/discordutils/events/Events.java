@@ -96,6 +96,12 @@ public class Events implements Listener {
                     Message.CAN_NOT_SEND_MESSAGE.getFormattedText(true).forEach(player::sendMessage);
                 });
             }
+
+            long timeToAuthorize = Main.getInstance().getConfigManager().getConfig().getLong("Discord.2FATimeToAuthorize");
+
+            if(timeToAuthorize > 0) Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
+                if(player != null) player.kickPlayer(Message.TWOFACTOR_TIME_TO_AUTHORIZE_HAS_EXPIRED.getText());
+            }, timeToAuthorize*20L);
         }
 
         if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.NotifyAboutDisabled2FA")) {

@@ -1,115 +1,118 @@
 # PermissionsPlugin
-# Плагин на пермишены, использующийся вами (оставьте пустым, если хотите отключить интеграцию)
-# Доступные на данный момент плагины: LuckPerms, Vault (включает в себя поддержку множества плагинов, список: https://www.spigotmc.org/resources/vault.34315/)
+# Permission plugin that you are currently using (set it to '' if you want to disable the permission integration)
+# Available plugins: LuckPerms, Vault (includes many plugins support: https://www.spigotmc.org/resources/vault.34315/)
 # ------------------------------------------------------------------
 # CheckForUpdates
-# Проверка на наличие не установленных обновлений плагина
+# Set it to true if you want plugin to check for available updates, otherwise set it to false
 # ------------------------------------------------------------------
 # BotToken
-# Токен, необходимый для работы бота. Получить его можно здесь: https://discord.com/developers/applications
+# Token that is required for the bot to work. You can get it here: https://discord.com/developers/applications
 # ------------------------------------------------------------------
 # BotPrefix
-# Префикс, использующийся в командах бота
+# Prefix that is used in bot's commands
 # ------------------------------------------------------------------
 # BotCommandTextChannels
-# Текстовые каналы, в которых бот реагирует на команды (если список пуст, то бот реагирует на команды во всех текстовых каналах)
+# Text channels, in which the bot handles the commands (if it is empty, the bot will handle the commands in all the text channels)
 # ------------------------------------------------------------------
 # AsyncBotLoading
-# Включить ли асинхронную загрузку бота (желательно включить, если она у вас по каким-то причинам не работает, то выключите)
+# Enable or not the bot's async loading (I strongly recommend you to keep this setting enabled, but if it doesn't work for you for some reason, feel free to disable it)
 # ------------------------------------------------------------------
 # Activities
-# Enabled - true - включено, false - выключено
-# UpdateDelay - время в секундах, циклично по истечению которого будет обновляться активность бота
-# Type - тип активности бота (доступные: default, streaming, listening, watching, competing)
-# Text - текст активности
+# Enabled - true - enabled, false - disabled
+# UpdateDelay - time (in seconds), after which the bot activity will be updated (cyclically)
+# Type - activity type (available: default, streaming, listening, watching, competing)
+# Text - activity text
 # ------------------------------------------------------------------
 # SuccessfulEmbedColor
-# Цвет embed-сообщений для сообщений типа successful
+# Successful embed messages' type color
 # ------------------------------------------------------------------
 # InformationEmbedColor
-# Цвет embed-сообщений для сообщений типа information
+# Info embed messages' type color
 # ------------------------------------------------------------------
 # ErrorEmbedColor
-# Цвет embed-сообщений для сообщений типа error
+# Error embed messages' type color
 # ------------------------------------------------------------------
 # GroupRoles
-# Данные роли будут автоматически выдаваться, если у игрока есть соответствующая группа
-# Сюда вводим роли по следующему формату: id_роли: 'название_группы'
-# Пример:
+# These roles will automatically be assigned if the player owns respective groups
+# Format: role_id: 'group_name'
+# For example:
 # GroupRoles:
 #   905508941230915684: 'admin'
 #   934834130198751892: 'vip'
 # ------------------------------------------------------------------
 # AdminRoles
-# Сюда нужно вводить id ролей (списком). Эти роли смогут выполнять команды для администраторов.
-# Пример: AdminRoles: [905508941230915684, 123123123131231233]
+# Members with these roles are considered as administrators and will be able to perform admin commands (such as !sudo)
+# For example: AdminRoles: [905508941230915684, 123123123131231233]
 # ------------------------------------------------------------------
 # VerifiedRole
-# Enabled - true - выдавать, false - не выдавать
-# Id - id роли, выдающейся после верификации
+# Enabled - true - assign, false - don't assign
+# Id - role id that is assigned after the verification
 # ------------------------------------------------------------------
 # 2FAType
-# Тип двухфакторной аутентификации. code - ввести код, reaction - нажать на реакцию в Discord'e
+# Type of the 2FA. Available: code - enter the code, reaction - click on a reaction in Discord
 # ------------------------------------------------------------------
 # 2FASessions
-# Включить ли сессии (ненадобность прохождения 2FA, если айпи сохранился) для двухфакторной аутентификации
+# Whether to enable or not 2FA sessions (uselessness of passing 2FA if the player's IP address is the same)
 # ------------------------------------------------------------------
 # 2FASessionTime
-# Время, в течение которого действительна сессия 2FA (указывается в секундах) (если меньше, либо равно 0, то действует до рестарта плагина)
+# Time during which is valid 2FA session (in seconds) (if it is less or equal to 0, it will be valid till the plugin restart)
+# ------------------------------------------------------------------
+# 2FATimeToAuthorize
+# Time during which the player has to pass 2FA, otherwise he will be kicked (in seconds) (if less or equal to 0, he will not be limited by time)
 # ------------------------------------------------------------------
 # Default2FAValue
-# Включать ли двухфакторную аутентификацию игроку сразу после верификации
+# Whether to enable or not 2FA for the player when he verify his account
 # ------------------------------------------------------------------
 # NotifyAboutDisabled2FA
-# Отправлять ли игроку при каждом заходе на сервер сообщение о том, что у него выключена двухфакторная аутентикация (если выключена)
+# Whether to send for the player or not information about disabled 2FA (if it is disabled)
 # ------------------------------------------------------------------
 # ForceVerification
-# Обязывать ли игроков пройти верификацию
+# Whether to force players to verify their accounts or not
 # ------------------------------------------------------------------
 # AllowedCommandsBeforePassing2FA
-# Список разрешенных команд перед прохождением 2FA
+# List of the allowed commands before passing 2FA
 # ------------------------------------------------------------------
 # ActionsAfterFailing2FA
-# Список действий, выполняющихся при провале 2FA n раз
-# Messages - сообщения, отправляющиеся при провале 2FA n раз
-# Commands - команды, выполняющиеся при провале 2FA n раз
+# List of the actions that will be performed after the player fails 2FA n times
+# Messages - messages that are sent when the player fails 2FA n times
+# Commands - commands that are executed when the player fails 2FA n times
 # ------------------------------------------------------------------
 # CommandsAfterVerification
-# Команды, которые выполняются сразу после того, как игрок верифицирует свой аккаунт (%player% - плейсхолдер для получения ника игрока)
+# Commands that are performed after the player verify his account (%player% - placeholder for the player nickname)
 # ------------------------------------------------------------------
 # CommandsAfterServerBoosting
-# Команды, которые выполняются сразу после того, как игрок бустит сервер в Discord (%player% - плейсхолдер для получения ника игрока, %user% - плейсхолдер для получения ник игрока в Discord)
+# Commands that are performed after the player boosts your Discord server (%player% - placeholder for the player nickname, %user% - placeholder for the player's Discord nickname)
 # ------------------------------------------------------------------
 # DelayedRolesCheck
-# Включить ли проверку ролей каждые Delay секунд (если выключить, то будет проверять только при выходе и входе игрока на сервер)
-# Enabled - true - включить, false - выключить
-# Delay - задержка между проверками
+# Whether to enable or disable the roles check every Delay seconds (if it is disable, the plugin will check it only when players join and leave the server)
+# Enabled - true - enable, false - disable
+# Delay - checks delay
 # ------------------------------------------------------------------
 # DelayedNamesCheck
-# Включить ли проверку никнеймов каждые Delay секунд (если выключить, то будет проверять только при выходе и входе игрока на сервер)
-# Enabled - true - включить, false - выключить
-# Delay - задержка между проверками
+# Whether to enable or disable the nicknames check every Delay seconds (if it is disable, the plugin will check it only when players join and leave the server)
+# Enabled - true - enable, false - disable
+# Delay - checks delay
 # ------------------------------------------------------------------
 # GuildVoiceRewards
-# Включить ли выдачу наград за проведение времени (Time) в войсах на сервере в Discord
-# Enabled - true - включить, false - выключить
-# Time - минимальное время для получения награды
-# Reward - команда, выдающаяся при достижении минимального времени (выполняется несколько раз, если минимальное время отыграно несколько раз)
-# BlacklistedChannels - ID игнорирующихся каналов. Пример: BlacklistedChannels: [905508941230915684, 123123123131231233]
+# Whether to enable or not the reward giving for spending time in the voice channels on your server in Discord
+# Enabled - true - enable, false - disable
+# Time - minimum time for achieving the reward (in seconds)
+# Reward - command that is executed if the player reach the minimum time (executes multiple times if the minimum time is played by player more than one time)
+# BlacklistedChannels - ignored channel IDs. For example: BlacklistedChannels: [905508941230915684, 123123123131231233]
 # ------------------------------------------------------------------
 # MessagesChannel
-# Включить ли отправку сообщений из игры в Discord (/du sendtodiscord)
-# Enabled - true - включить, false - выключить
-# Id - ID канала, в который будут отправляться сообщения
+# Whether to enable or not the possibility to send messages to Discord from the game (/du sendtodiscord)
+# Enabled - true - enable, false - disable
+# Id - text channel ID, in which will appear the messages
 # ------------------------------------------------------------------
 # Database
-# Использование базы данных для хранения данных плагина (вместо data.yml)
-# Type - тип базы данных (доступные: mysql) (чтобы отключить - оставьте пустую строку, в этом случае все будет работать по data.yml)
-# Host - хост (стандартный - localhost)
-# Port - порт (стандартный - 3306)
-# Database - название использующейся плагином базы данных
-# Username - имя пользователя (стандартное - root)
-# Password - пароль (по стандарту его нет)
+# Usage of the database instead of the data.yml file to save and load your data
+# Type - database type (available: mysql) (set it to '' to disable this feature, in this case the data will be stored in the data.yml file)
+# Host - database host (by default - localhost)
+# Port - database port (by default - 3306)
+# Database - database name
+# Username - database username (by default - root)
+# Password - database password (by default there is not a password)
 
 PermissionsPlugin: 'LuckPerms'
 CheckForUpdates: true
@@ -126,7 +129,7 @@ Discord:
       Text: 'Minecraft'
     2:
       Type: 'watching'
-      Text: 'mirrerror#4790'
+      Text: 'mirrerror#7777'
     3:
       Type: 'watching'
       Text: 'DiscordUtils'
@@ -141,6 +144,7 @@ Discord:
   2FAType: 'reaction'
   2FASessions: true
   2FASessionTime: 900
+  2FATimeToAuthorize: 30
   Default2FAValue: false
   NotifyAboutDisabled2FA: true
   ForceVerification: false
@@ -148,12 +152,12 @@ Discord:
   ActionsAfterFailing2FA:
     1:
       Messages:
-        - 'Вы провалили двухфакторную аутентификацию &bодин&f раз. Если Вы провалите ее еще два раза, то Ваш IP-адрес будет заблокирован. '
+        - 'You have failed 2FA for &bone&f time. If you will have failed 2FA &btwo&f more times, your IP address will be banned.'
       Commands: []
     3:
       Messages: []
       Commands:
-        - 'banip %player% 30m Подозрительная активность.'
+        - 'banip %player% 30m Suspicious activity.'
   CommandsAfterVerification: []
   CommandsAfterServerBoosting: []
   DelayedRolesCheck:

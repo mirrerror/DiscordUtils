@@ -4,8 +4,11 @@ import md.mirrerror.discordutils.Main;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -21,19 +24,40 @@ public class BotController {
     private static JDA jda;
     private String botPrefix = Main.getInstance().getConfigManager().getConfig().getString("Discord.BotPrefix");
 
-    private static Map<String, User> linkCodes = new HashMap<>();
-    private static Map<Player, String> twoFactorPlayers = new HashMap<>();
-    private static Map<String, Integer> twoFactorAttempts = new HashMap<>(); // ip, attempts
-    private static Map<UUID, TwoFactorSession> sessions = new HashMap<>();
-    private static Map<User, LocalDateTime> voiceTime = new HashMap<>();
-    private static Map<Player, Message> unlinkPlayers = new HashMap<>();
+    private static final List<GatewayIntent> gatewayIntents = new ArrayList<>();
 
-    private static List<Long> rewardBlacklistedVoiceChannels = new ArrayList<>();
+    private static final Map<String, User> linkCodes = new HashMap<>();
+    private static final Map<Player, String> twoFactorPlayers = new HashMap<>();
+    private static final Map<String, Integer> twoFactorAttempts = new HashMap<>(); // ip, attempts
+    private static final Map<UUID, TwoFactorSession> sessions = new HashMap<>();
+    private static final Map<User, LocalDateTime> voiceTime = new HashMap<>();
+    private static final Map<Player, Message> unlinkPlayers = new HashMap<>();
+
+    private static final List<Long> rewardBlacklistedVoiceChannels = new ArrayList<>();
 
     public static void setupBot(String token) {
         try {
-            jda = JDABuilder.createDefault(token).build().awaitReady();
-            jda.addEventListener(new EventListener());
+            setupGatewayIntents();
+
+            jda = JDABuilder.create(gatewayIntents)
+                            .setMemberCachePolicy(MemberCachePolicy.ALL)
+                            .addEventListeners(new EventListener())
+                            .setAutoReconnect(true)
+                            .setToken(token)
+                            .setContextEnabled(false)
+                            .setBulkDeleteSplittingEnabled(false)
+                            .build();
+            jda.awaitReady();
+
+            for (Guild guild : jda.getGuilds()) {
+                guild.retrieveOwner(true).queue();
+                guild.loadMembers().onSuccess(members -> {
+                    Main.getInstance().getLogger().info("Successfully loaded " + members.size() + " members in guild " + guild.getName() + ".");
+                }).onError(error -> {
+                    Main.getInstance().getLogger().severe("Failed to load members of the guild " + guild.getName() + "!");
+                }).get();
+            }
+
             setupGroupRoles();
             setupAdminRoles();
             setupRewardBlacklistedVoiceChannels();
@@ -74,8 +98,22 @@ public class BotController {
         long updateDelay = Main.getInstance().getConfigManager().getConfig().getLong("Discord.Activities.UpdateDelay");
         Bukkit.getScheduler().runTaskTimer(Main.getInstance(), () -> {
             Activity activity = Main.getInstance().getActivityManager().nextActivity();
-            jda.getPresence().setActivity(activity);
+            jda.getPresence().setActivity(Activity.of(activity.getType(), Main.getInstance().getPapiManager().setPlaceholders(null, activity.getName())));
         }, 0L, updateDelay*20L);
+    }
+
+    public static void setupGatewayIntents() {
+        gatewayIntents.add(GatewayIntent.GUILD_MEMBERS);
+        gatewayIntents.add(GatewayIntent.GUILD_EMOJIS);
+        gatewayIntents.add(GatewayIntent.GUILD_INVITES);
+        gatewayIntents.add(GatewayIntent.GUILD_VOICE_STATES);
+        gatewayIntents.add(GatewayIntent.GUILD_PRESENCES);
+        gatewayIntents.add(GatewayIntent.GUILD_MESSAGES);
+        gatewayIntents.add(GatewayIntent.GUILD_MESSAGE_REACTIONS);
+        gatewayIntents.add(GatewayIntent.GUILD_MESSAGE_TYPING);
+        gatewayIntents.add(GatewayIntent.DIRECT_MESSAGES);
+        gatewayIntents.add(GatewayIntent.DIRECT_MESSAGE_REACTIONS);
+        gatewayIntents.add(GatewayIntent.DIRECT_MESSAGE_TYPING);
     }
 
     public static Map<Long, String> getGroupRoles() {
