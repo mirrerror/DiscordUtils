@@ -100,7 +100,9 @@ public class Events implements Listener {
             long timeToAuthorize = Main.getInstance().getConfigManager().getConfig().getLong("Discord.2FATimeToAuthorize");
 
             if(timeToAuthorize > 0) Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
-                if(player != null) player.kickPlayer(Message.TWOFACTOR_TIME_TO_AUTHORIZE_HAS_EXPIRED.getText());
+                if(player != null) {
+                    if(BotController.getTwoFactorPlayers().containsKey(player)) player.kickPlayer(Message.TWOFACTOR_TIME_TO_AUTHORIZE_HAS_EXPIRED.getText());
+                }
             }, timeToAuthorize*20L);
         }
 
