@@ -14,10 +14,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class DiscordUtils {
@@ -130,7 +127,12 @@ public class DiscordUtils {
 
     public static boolean isAdmin(Member member) {
         if(member != null) {
-            return Sets.intersection(new HashSet<>(BotController.getAdminRoles()), new HashSet<>(member.getRoles())).size() > 0;
+            List<Role> adminRoles = new ArrayList<>();
+            BotController.getAdminRoles().forEach(roleId -> {
+                Role role = member.getGuild().getRoleById(roleId);
+                if(role != null) adminRoles.add(member.getGuild().getRoleById(roleId));
+            });
+            return Sets.intersection(new HashSet<>(adminRoles), new HashSet<>(member.getRoles())).size() > 0;
         }
         return false;
     }

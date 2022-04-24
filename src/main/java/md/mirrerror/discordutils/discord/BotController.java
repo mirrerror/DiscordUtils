@@ -30,9 +30,10 @@ public class BotController {
     private static final Map<User, LocalDateTime> voiceTime = new HashMap<>();
     private static final Map<Player, Message> unlinkPlayers = new HashMap<>();
 
-    private static final List<Long> rewardBlacklistedVoiceChannels = new ArrayList<>();
+    private static List<Long> rewardBlacklistedVoiceChannels = new ArrayList<>();
 
     private static TextChannel serverActivityLoggingTextChannel;
+    private static TextChannel consoleLoggingTextChannel;
 
     public static void setupBot(String token) {
         try {
@@ -59,6 +60,7 @@ public class BotController {
 
             setupGroupRoles();
             setupAdminRoles();
+
             setupRewardBlacklistedVoiceChannels();
             if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.Activities.Enabled")) {
                 setupActivityChanger();
@@ -72,6 +74,13 @@ public class BotController {
 
             if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.ServerActivityLogging.Enabled")) {
                 serverActivityLoggingTextChannel = jda.getTextChannelById(Main.getInstance().getConfigManager().getConfig().getLong("Discord.ServerActivityLogging.ChannelId"));
+            }
+
+            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.Console.Enabled")) {
+                consoleLoggingTextChannel = jda.getTextChannelById(Main.getInstance().getConfigManager().getConfig().getLong("Discord.Console.ChannelId"));
+                ConsoleLoggingManager consoleLoggingManager = new ConsoleLoggingManager();
+                consoleLoggingManager.initialize();
+                jda.addEventListener(new ConsoleCommandsListener());
             }
 
             Main.getInstance().getLogger().info("Bot has been successfully loaded.");
@@ -93,7 +102,7 @@ public class BotController {
     }
 
     public static void setupRewardBlacklistedVoiceChannels() {
-        adminRoles = Main.getInstance().getConfigManager().getConfig().getLongList("Discord.GuildVoiceRewards.BlacklistedChannels");
+        rewardBlacklistedVoiceChannels = Main.getInstance().getConfigManager().getConfig().getLongList("Discord.GuildVoiceRewards.BlacklistedChannels");
     }
 
     public static void setupActivityChanger() {
@@ -166,5 +175,9 @@ public class BotController {
 
     public static TextChannel getServerActivityLoggingTextChannel() {
         return serverActivityLoggingTextChannel;
+    }
+
+    public static TextChannel getConsoleLoggingTextChannel() {
+        return consoleLoggingTextChannel;
     }
 }

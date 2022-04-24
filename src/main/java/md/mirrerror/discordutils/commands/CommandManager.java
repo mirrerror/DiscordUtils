@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class CommandManager implements CommandExecutor {
 
-    private static Map<String, List<SubCommand>> commands = new HashMap<>();
+    private static final Map<String, List<SubCommand>> commands = new HashMap<>();
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

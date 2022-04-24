@@ -117,6 +117,11 @@
 # DeathEmbedColor - death embed messages' type color
 # ChatEmbedColor - chat embed messages' type color
 # ------------------------------------------------------------------
+# Console
+# Whether to enable or not the virtual console in the specified Discord channel
+# Enabled - true - enable, false - disable
+# ChannelId - text channel ID, in which will appear the console messages
+# ------------------------------------------------------------------
 # Database
 # Usage of the database instead of the data.yml file to save and load your data
 # Type - database type (available: mysql) (set it to '' to disable this feature, in this case the data will be stored in the data.yml file)
@@ -194,6 +199,9 @@ Discord:
     QuitEmbedColor: '#f34520'
     DeathEmbedColor: '#f34520'
     ChatEmbedColor: '#e8d725'
+  Console:
+    Enabled: false
+    ChannelId: -1
 Database:
   Type: ''
   Host: 'localhost'
