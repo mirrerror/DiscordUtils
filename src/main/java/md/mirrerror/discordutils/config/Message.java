@@ -61,7 +61,16 @@ public enum Message {
     SUCCESSFULLY,
     EMBED_FOOTER,
     STATS_FORMAT,
-    HELP;
+    HELP,
+
+    CHAT_LOGGING_EMBED_TITLE,
+    CHAT_LOGGING_EMBED_TEXT,
+    JOIN_LOGGING_EMBED_TITLE,
+    JOIN_LOGGING_EMBED_TEXT,
+    QUIT_LOGGING_EMBED_TITLE,
+    QUIT_LOGGING_EMBED_TEXT,
+    DEATH_LOGGING_EMBED_TITLE,
+    DEATH_LOGGING_EMBED_TEXT;
 
     public String getText() {
         return ChatColor.translateAlternateColorCodes('&', Main.getInstance().getConfigManager().getLang().getString(String.valueOf(this)).replace("\\n", "\n"));

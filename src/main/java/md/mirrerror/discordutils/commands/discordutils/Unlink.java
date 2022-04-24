@@ -1,11 +1,13 @@
 package md.mirrerror.discordutils.commands.discordutils;
 
+import md.mirrerror.discordutils.Main;
 import md.mirrerror.discordutils.commands.SubCommand;
 import md.mirrerror.discordutils.config.Message;
 import md.mirrerror.discordutils.discord.BotController;
 import md.mirrerror.discordutils.discord.DiscordUtils;
 import md.mirrerror.discordutils.discord.EmbedManager;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -39,6 +41,7 @@ public class Unlink implements SubCommand {
                 });
 
         Message.ACCOUNT_UNLINK_REQUEST_SENT.getFormattedText(true).forEach(sender::sendMessage);
+        Main.getInstance().getConfigManager().getConfig().getStringList("Discord.CommandsAfterUnlink").forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName())));
     }
 
     @Override

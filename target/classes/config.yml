@@ -80,6 +80,9 @@
 # CommandsAfterVerification
 # Commands that are performed after the player verify his account (%player% - placeholder for the player nickname)
 # ------------------------------------------------------------------
+# CommandsAfterUnlink
+# Commands that are performed after the player unlink his Discord account (%player% - placeholder for the player nickname)
+# ------------------------------------------------------------------
 # CommandsAfterServerBoosting
 # Commands that are performed after the player boosts your Discord server (%player% - placeholder for the player nickname, %user% - placeholder for the player's Discord nickname)
 # ------------------------------------------------------------------
@@ -104,6 +107,15 @@
 # Whether to enable or not the possibility to send messages to Discord from the game (/du sendtodiscord)
 # Enabled - true - enable, false - disable
 # Id - text channel ID, in which will appear the messages
+# ------------------------------------------------------------------
+# ServerActivityLogging
+# Whether to enable or not the logging of some server events to an Discord channel
+# Enabled - true - enable, false - disable
+# ChannelId - text channel ID, in which will appear the logging messages
+# JoinEmbedColor - join embed messages' type color
+# QuitEmbedColor - quit embed messages' type color
+# DeathEmbedColor - death embed messages' type color
+# ChatEmbedColor - chat embed messages' type color
 # ------------------------------------------------------------------
 # Database
 # Usage of the database instead of the data.yml file to save and load your data
@@ -159,6 +171,7 @@ Discord:
       Commands:
         - 'banip %player% 30m Suspicious activity.'
   CommandsAfterVerification: []
+  CommandsAfterUnlink: []
   CommandsAfterServerBoosting: []
   DelayedRolesCheck:
     Enabled: true
@@ -174,6 +187,13 @@ Discord:
   MessagesChannel:
     Enabled: false
     Id: -1
+  ServerActivityLogging:
+    Enabled: false
+    ChannelId: -1
+    JoinEmbedColor: '#8de113'
+    QuitEmbedColor: '#f34520'
+    DeathEmbedColor: '#f34520'
+    ChatEmbedColor: '#e8d725'
 Database:
   Type: ''
   Host: 'localhost'

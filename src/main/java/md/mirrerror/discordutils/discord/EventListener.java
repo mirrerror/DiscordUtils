@@ -174,12 +174,6 @@ public class EventListener extends ListenerAdapter {
 
                                 if(guild.isMember(event.getUser())) member = guild.getMember(event.getUser());
 
-                                /*try {
-                                    member = guild.retrieveMember(event.getUser()).complete();
-                                } catch (ErrorResponseException exception) {
-                                    if(exception.getErrorCode() != DiscordUtils.UNKNOWN_MEMBER_EXCEPTION) exception.printStackTrace();
-                                }*/
-
                                 if(verifiedRole != null && member != null) guild.removeRoleFromMember(member, verifiedRole).queue();
                             });
                         }

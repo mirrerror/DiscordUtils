@@ -9,6 +9,7 @@ import md.mirrerror.discordutils.database.MySQLManager;
 import md.mirrerror.discordutils.discord.ActivityManager;
 import md.mirrerror.discordutils.discord.BotController;
 import md.mirrerror.discordutils.events.Events;
+import md.mirrerror.discordutils.events.ServerActivityLoggerHandler;
 import md.mirrerror.discordutils.utils.integrations.permissions.LuckPermsIntegration;
 import md.mirrerror.discordutils.utils.integrations.permissions.PermissionsIntegration;
 import md.mirrerror.discordutils.utils.integrations.permissions.VaultIntegration;
@@ -67,10 +68,10 @@ public final class Main extends JavaPlugin {
         // Plugin startup logic
         instance = this;
         configManager = new ConfigManager();
+        getLogger().info("Configuration files have been successfully loaded.");
         papiManager = new PAPIManager();
         activityManager = new ActivityManager();
         getLogger().info("ActivityManager has been successfully enabled.");
-        getLogger().info("Configuration files have been successfully loaded.");
         if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.AsyncBotLoading")) {
             Bukkit.getScheduler().runTaskAsynchronously(this, () -> BotController.setupBot(configManager.getConfig().getString("Discord.BotToken")));
         } else {
@@ -82,6 +83,9 @@ public final class Main extends JavaPlugin {
         registerCommands();
         getLogger().info("Commands have been successfully loaded.");
         Bukkit.getPluginManager().registerEvents(new Events(), this);
+        if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.ServerActivityLogging.Enabled")) {
+            Bukkit.getPluginManager().registerEvents(new ServerActivityLoggerHandler(), this);
+        }
         getLogger().info("Events have been successfully loaded.");
         setupTwoFactorType();
         getLogger().info("2FA has been successfully loaded.");

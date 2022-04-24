@@ -3,10 +3,7 @@ package md.mirrerror.discordutils.discord;
 import md.mirrerror.discordutils.Main;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.bukkit.Bukkit;
@@ -34,6 +31,8 @@ public class BotController {
     private static final Map<Player, Message> unlinkPlayers = new HashMap<>();
 
     private static final List<Long> rewardBlacklistedVoiceChannels = new ArrayList<>();
+
+    private static TextChannel serverActivityLoggingTextChannel;
 
     public static void setupBot(String token) {
         try {
@@ -64,12 +63,17 @@ public class BotController {
             if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.Activities.Enabled")) {
                 setupActivityChanger();
             }
-            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.DelayedRolesCheck.Enabled")) {
+            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.DelayedRolesCheck.Enabled") && Main.getPermissionsPlugin() != Main.PermissionsPlugin.NONE) {
                 DiscordUtils.setupDelayedRolesCheck();
             }
             if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.DelayedNamesCheck.Enabled")) {
                 DiscordUtils.setupDelayedNamesCheck();
             }
+
+            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.ServerActivityLogging.Enabled")) {
+                serverActivityLoggingTextChannel = jda.getTextChannelById(Main.getInstance().getConfigManager().getConfig().getLong("Discord.ServerActivityLogging.ChannelId"));
+            }
+
             Main.getInstance().getLogger().info("Bot has been successfully loaded.");
         } catch (LoginException | InterruptedException e) {
             Main.getInstance().getLogger().severe("Something went wrong while setting up the bot!");
@@ -158,5 +162,9 @@ public class BotController {
 
     public static Map<String, Integer> getTwoFactorAttempts() {
         return twoFactorAttempts;
+    }
+
+    public static TextChannel getServerActivityLoggingTextChannel() {
+        return serverActivityLoggingTextChannel;
     }
 }

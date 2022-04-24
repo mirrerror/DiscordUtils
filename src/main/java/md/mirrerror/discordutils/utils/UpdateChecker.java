@@ -22,7 +22,7 @@ public class UpdateChecker {
                 String version = Main.getInstance().getDescription().getVersion();
                 String latestVersion = bufferedReader.readLine().trim();
                 if(!latestVersion.equalsIgnoreCase(version)) {
-                    Main.getInstance().getLogger().info("There is a new plugin version available! Make sure to update!");
+                    Main.getInstance().getLogger().info("There is a new plugin version available! Make sure to download the update!");
                     Main.getInstance().getLogger().info("Your version: " + version + "; latest version: " + latestVersion + ".");
                     Main.getInstance().getLogger().info("Links:");
                     Main.getInstance().getLogger().info("SpigotMC: https://www.spigotmc.org/resources/discordutils-discord-bot-for-your-minecraft-server.97433/");
