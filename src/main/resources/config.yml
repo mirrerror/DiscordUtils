@@ -121,6 +121,26 @@
 # Whether to enable or not the virtual console in the specified Discord channel
 # Enabled - true - enable, false - disable
 # ChannelId - text channel ID, in which will appear the console messages
+# BlacklistedCommands - commands that can't be executed from the virtual console
+# ------------------------------------------------------------------
+# NotifyAboutMentions
+# Whether to notify the verified players about the mentions in Discord or not
+# Enabled - true - enable, false - disable
+# Title - title message settings
+# Enabled - true - enable, false - disable
+# FadeIn - fade in time
+# Stay - stay time
+# FadeOut - fade out time
+# Title - title text (top)
+# Subtitle - subtitle text (bottom)
+# Message - chat message settings
+# Enabled - true - enable, false - disable
+# Text - message text
+# Sound - sound settings
+# Enabled - true - enable, false - disable
+# Type - sound type
+# Volume - sound volume
+# Pitch - sound pitch
 # ------------------------------------------------------------------
 # Database
 # Usage of the database instead of the data.yml file to save and load your data
@@ -202,6 +222,24 @@ Discord:
   Console:
     Enabled: false
     ChannelId: -1
+    BlacklistedCommands: []
+  NotifyAboutMentions:
+    Enabled: true
+    Title:
+      Enabled: true
+      FadeIn: 3
+      Stay: 50
+      FadeOut: 3
+      Title: '&bNew mention!'
+      Subtitle: '&fCheck your &9Discord&f.'
+    Message:
+      Enabled: false
+      Text: '&9DiscordUtils &7/&f You have been mentioned in &9Discord&f.'
+    Sound:
+      Enabled: true
+      Type: 'ENTITY_EXPERIENCE_ORB_PICKUP'
+      Volume: 1
+      Pitch: 1
 Database:
   Type: ''
   Host: 'localhost'

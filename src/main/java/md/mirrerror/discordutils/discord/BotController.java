@@ -1,6 +1,9 @@
 package md.mirrerror.discordutils.discord;
 
 import md.mirrerror.discordutils.Main;
+import md.mirrerror.discordutils.discord.listeners.ConsoleCommandsListener;
+import md.mirrerror.discordutils.discord.listeners.EventListener;
+import md.mirrerror.discordutils.discord.listeners.MentionsListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -31,6 +34,7 @@ public class BotController {
     private static final Map<Player, Message> unlinkPlayers = new HashMap<>();
 
     private static List<Long> rewardBlacklistedVoiceChannels = new ArrayList<>();
+    private static List<String> virtualConsoleBlacklistedCommands = new ArrayList<>();
 
     private static TextChannel serverActivityLoggingTextChannel;
     private static TextChannel consoleLoggingTextChannel;
@@ -61,7 +65,9 @@ public class BotController {
             setupGroupRoles();
             setupAdminRoles();
 
-            setupRewardBlacklistedVoiceChannels();
+            rewardBlacklistedVoiceChannels = Main.getInstance().getConfigManager().getConfig().getLongList("Discord.GuildVoiceRewards.BlacklistedChannels");
+            virtualConsoleBlacklistedCommands = Main.getInstance().getConfigManager().getConfig().getStringList("Discord.Console.BlacklistedCommands");
+
             if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.Activities.Enabled")) {
                 setupActivityChanger();
             }
@@ -83,6 +89,10 @@ public class BotController {
                 jda.addEventListener(new ConsoleCommandsListener());
             }
 
+            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.NotifyAboutMentions.Enabled")) {
+                jda.addEventListener(new MentionsListener());
+            }
+
             Main.getInstance().getLogger().info("Bot has been successfully loaded.");
         } catch (LoginException | InterruptedException e) {
             Main.getInstance().getLogger().severe("Something went wrong while setting up the bot!");
@@ -99,10 +109,6 @@ public class BotController {
 
     public static void setupAdminRoles() {
         adminRoles = Main.getInstance().getConfigManager().getConfig().getLongList("Discord.AdminRoles");
-    }
-
-    public static void setupRewardBlacklistedVoiceChannels() {
-        rewardBlacklistedVoiceChannels = Main.getInstance().getConfigManager().getConfig().getLongList("Discord.GuildVoiceRewards.BlacklistedChannels");
     }
 
     public static void setupActivityChanger() {
@@ -179,5 +185,9 @@ public class BotController {
 
     public static TextChannel getConsoleLoggingTextChannel() {
         return consoleLoggingTextChannel;
+    }
+
+    public static List<String> getVirtualConsoleBlacklistedCommands() {
+        return virtualConsoleBlacklistedCommands;
     }
 }
