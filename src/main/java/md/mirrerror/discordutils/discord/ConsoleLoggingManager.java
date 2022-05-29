@@ -6,6 +6,7 @@ import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.config.Property;
 import org.apache.logging.log4j.core.layout.PatternLayout;
+import org.bukkit.ChatColor;
 
 import java.util.concurrent.RejectedExecutionException;
 
@@ -30,7 +31,7 @@ public class ConsoleLoggingManager extends AbstractAppender {
         StringBuilder stringBuilder = new StringBuilder();
         PatternLayout.newBuilder().withPattern("[%d{HH:mm:ss} %level]: %msg").build().serialize(e, stringBuilder);
 
-        String message = stringBuilder.toString();
+        String message = ChatColor.stripColor(stringBuilder.toString());
         if(message.length() > 2000) message = message.substring(0, 1990) + "...";
 
         try {

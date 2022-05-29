@@ -139,9 +139,15 @@ public class Events implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onCommand(PlayerCommandPreprocessEvent event) {
-        if(!allowedCommands.contains(event.getMessage().substring(1))) {
-            checkTwoFactor(event.getPlayer(), event);
-            checkVerification(event.getPlayer(), event);
+        Player player = event.getPlayer();
+        if(BotController.getTwoFactorPlayers().containsKey(player) ||
+                Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.ForceVerification") && !DiscordUtils.isVerified(player)) {
+
+            if(!isAllowedCommand(event.getMessage().substring(1))) {
+                checkTwoFactor(event.getPlayer(), event);
+                checkVerification(event.getPlayer(), event);
+            }
+
         }
     }
 
@@ -260,6 +266,14 @@ public class Events implements Listener {
                 Message.VERIFICATION_NEEDED.getFormattedText(true).forEach(player::sendMessage);
             }
         }
+    }
+
+    private boolean isAllowedCommand(String cmd) {
+        for (String s : allowedCommands) {
+            if(cmd.length() < s.length()) continue;
+            if(cmd.substring(0, s.length()).equalsIgnoreCase(s)) return true;
+        }
+        return false;
     }
 
 }

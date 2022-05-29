@@ -184,6 +184,9 @@ public class EventListener extends ListenerAdapter {
                     }
                     BotController.getUnlinkPlayers().remove(player);
                     Message.ACCOUNT_SUCCESSFULLY_UNLINKED.getFormattedText(true).forEach(player::sendMessage);
+                    Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
+                        Main.getInstance().getConfigManager().getConfig().getStringList("Discord.CommandsAfterUnlink").forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName())));
+                    });
                 }
                 if(event.getReaction().getReactionEmote().getName().equals("❎")) {
                     BotController.getUnlinkPlayers().remove(player);

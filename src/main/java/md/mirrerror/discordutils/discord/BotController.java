@@ -112,13 +112,20 @@ public class BotController {
     }
 
     public static void setupActivityChanger() {
-        if(Main.getInstance().getActivityManager().getBotActivities().size() <= 1) return;
+        if(Main.getInstance().getActivityManager().getBotActivities().size() == 1) {
 
-        long updateDelay = Main.getInstance().getConfigManager().getConfig().getLong("Discord.Activities.UpdateDelay");
-        Bukkit.getScheduler().runTaskTimer(Main.getInstance(), () -> {
             Activity activity = Main.getInstance().getActivityManager().nextActivity();
             jda.getPresence().setActivity(Activity.of(activity.getType(), Main.getInstance().getPapiManager().setPlaceholders(null, activity.getName())));
-        }, 0L, updateDelay*20L);
+
+        } else {
+
+            long updateDelay = Main.getInstance().getConfigManager().getConfig().getLong("Discord.Activities.UpdateDelay");
+            Bukkit.getScheduler().runTaskTimer(Main.getInstance(), () -> {
+                Activity activity = Main.getInstance().getActivityManager().nextActivity();
+                jda.getPresence().setActivity(Activity.of(activity.getType(), Main.getInstance().getPapiManager().setPlaceholders(null, activity.getName())));
+            }, 0L, updateDelay*20L);
+
+        }
     }
 
     public static void setupGatewayIntents() {

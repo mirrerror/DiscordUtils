@@ -41,7 +41,6 @@ public class Unlink implements SubCommand {
                 });
 
         Message.ACCOUNT_UNLINK_REQUEST_SENT.getFormattedText(true).forEach(sender::sendMessage);
-        Main.getInstance().getConfigManager().getConfig().getStringList("Discord.CommandsAfterUnlink").forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName())));
     }
 
     @Override
