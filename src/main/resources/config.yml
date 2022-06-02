@@ -77,8 +77,11 @@
 # Messages - messages that are sent when the player fails 2FA n times
 # Commands - commands that are executed when the player fails 2FA n times
 # ------------------------------------------------------------------
+# CommandsAfter2FA
+# Commands that are executed after the player passes 2FA successfully
+# ------------------------------------------------------------------
 # CommandsAfterVerification
-# Commands that are performed after the player verify his account (%player% - placeholder for the player nickname)
+# Commands that are performed after the player verify his account (%player% - placeholder for the player nickname, %discord_id% - placeholder for the account in Discord)
 # ------------------------------------------------------------------
 # CommandsAfterUnlink
 # Commands that are performed after the player unlink his Discord account (%player% - placeholder for the player nickname)
@@ -195,6 +198,7 @@ Discord:
       Messages: []
       Commands:
         - 'banip %player% 30m Suspicious activity.'
+  CommandsAfter2FA: []
   CommandsAfterVerification: []
   CommandsAfterUnlink: []
   CommandsAfterServerBoosting: []

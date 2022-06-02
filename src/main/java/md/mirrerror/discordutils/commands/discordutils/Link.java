@@ -53,9 +53,9 @@ public class Link implements SubCommand {
                 }
             }
         }
+        Main.getInstance().getConfigManager().getConfig().getStringList("Discord.CommandsAfterVerification").forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName()).replace("%discord_id%", BotController.getLinkCodes().get(args[0]).getId())));
         BotController.getLinkCodes().remove(args[0]);
         Message.ACCOUNT_SUCCESSFULLY_LINKED.getFormattedText(true).forEach(sender::sendMessage);
-        Main.getInstance().getConfigManager().getConfig().getStringList("Discord.CommandsAfterVerification").forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName())));
     }
 
     @Override

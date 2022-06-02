@@ -203,9 +203,11 @@ public class EventListener extends ListenerAdapter {
                 if(event.getReaction().getReactionEmote().getName().equals("✅")) {
                     BotController.getTwoFactorPlayers().remove(player);
                     player.sendMessage(Message.TWOFACTOR_AUTHORIZED.getText(true));
-                    BotController.getSessions().put(player.getUniqueId(), new TwoFactorSession(StringUtils.remove(player.getAddress().getAddress().toString(), '/'),
-                            LocalDateTime.now().plusSeconds(Main.getInstance().getConfigManager().getConfig().getLong("Discord.2FASessionTime"))));
-                }
+                    BotController.getSessions().put(player.getUniqueId(), new TwoFactorSession(StringUtils.remove(player.getAddress().getAddress().toString(), '/'), LocalDateTime.now().plusSeconds(Main.getInstance().getConfigManager().getConfig().getLong("Discord.2FASessionTime"))));
+                    Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
+                        Main.getInstance().getConfigManager().getConfig().getStringList("Discord.CommandsAfter2FA").forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName())));
+                    });
+				}
                 if(event.getReaction().getReactionEmote().getName().equals("❎")) {
                     BotController.getTwoFactorPlayers().remove(player);
                     Bukkit.getScheduler().runTask(Main.getInstance(), () -> player.kickPlayer(Message.TWOFACTOR_REJECTED.getText()));

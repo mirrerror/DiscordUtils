@@ -61,7 +61,7 @@ public class SlashCommandsManager extends ListenerAdapter {
             }
             case "sudo": {
                 event.deferReply().queue();
-                if(!DiscordUtils.isAdmin(event.getUser())) {
+                if(!DiscordUtils.isAdmin(event.getMember())) {
                     event.getHook().sendMessageEmbeds(embedManager.errorEmbed(Message.INSUFFICIENT_PERMISSIONS.getText())).queue();
                     return;
                 }
@@ -80,7 +80,7 @@ public class SlashCommandsManager extends ListenerAdapter {
             }
             case "embed": {
                 event.deferReply().queue();
-                if(!DiscordUtils.isAdmin(event.getUser())) {
+                if(!DiscordUtils.isAdmin(event.getMember())) {
                     event.getHook().sendMessageEmbeds(embedManager.errorEmbed(Message.INSUFFICIENT_PERMISSIONS.getText())).queue();
                     return;
                 }
