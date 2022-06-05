@@ -1,16 +1,17 @@
 package md.mirrerror.discordutils.commands.discordutils;
 
-import md.mirrerror.discordutils.Main;
 import md.mirrerror.discordutils.commands.SubCommand;
 import md.mirrerror.discordutils.config.Message;
 import md.mirrerror.discordutils.discord.BotController;
 import md.mirrerror.discordutils.discord.DiscordUtils;
 import md.mirrerror.discordutils.discord.EmbedManager;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Unlink implements SubCommand {
     @Override
@@ -51,5 +52,12 @@ public class Unlink implements SubCommand {
     @Override
     public String getPermission() {
         return "discordutils.discordutils.unlink";
+    }
+
+    @Override
+    public List<String> getAliases() {
+        List<String> aliases = new ArrayList<>();
+        aliases.add("ulink");
+        return aliases;
     }
 }

@@ -8,6 +8,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TwoFactor implements SubCommand {
 
     @Override
@@ -54,5 +57,12 @@ public class TwoFactor implements SubCommand {
     @Override
     public String getPermission() {
         return "discordutils.discordutils.twofactor";
+    }
+
+    @Override
+    public List<String> getAliases() {
+        List<String> aliases = new ArrayList<>();
+        aliases.add("2fa");
+        return aliases;
     }
 }

@@ -3,6 +3,8 @@ package md.mirrerror.discordutils;
 import md.mirrerror.discordutils.commands.CommandManager;
 import md.mirrerror.discordutils.commands.SubCommand;
 import md.mirrerror.discordutils.commands.discordutils.*;
+import md.mirrerror.discordutils.commands.discordutilsadmin.ForceUnlink;
+import md.mirrerror.discordutils.commands.discordutilsadmin.Reload;
 import md.mirrerror.discordutils.config.ConfigManager;
 import md.mirrerror.discordutils.database.DatabaseManager;
 import md.mirrerror.discordutils.database.MySQLManager;
@@ -164,16 +166,21 @@ public final class Main extends JavaPlugin {
 
     private void registerCommands() {
         CommandManager commandManager = new CommandManager();
-        List<SubCommand> subCommands = new ArrayList<>();
-        subCommands.add(new Link());
-        subCommands.add(new Reload());
-        subCommands.add(new TwoFactor());
-        subCommands.add(new Help());
-        subCommands.add(new SendToDiscord());
-        subCommands.add(new VoiceInvite());
-        subCommands.add(new Unlink());
-        subCommands.add(new GetDiscord());
-        commandManager.registerCommand("discordutils", subCommands);
+
+        List<SubCommand> discordUtilsSubCommands = new ArrayList<>();
+        discordUtilsSubCommands.add(new Link());
+        discordUtilsSubCommands.add(new TwoFactor());
+        discordUtilsSubCommands.add(new Help());
+        discordUtilsSubCommands.add(new SendToDiscord());
+        discordUtilsSubCommands.add(new VoiceInvite());
+        discordUtilsSubCommands.add(new Unlink());
+        discordUtilsSubCommands.add(new GetDiscord());
+        commandManager.registerCommand("discordutils", discordUtilsSubCommands);
+
+        List<SubCommand> discordUtilsAdminSubCommands = new ArrayList<>();
+        discordUtilsAdminSubCommands.add(new Reload());
+        discordUtilsAdminSubCommands.add(new ForceUnlink());
+        commandManager.registerCommand("discordutilsadmin", discordUtilsAdminSubCommands);
     }
 
     public static Main getInstance() {

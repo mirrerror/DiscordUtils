@@ -1,5 +1,6 @@
-package md.mirrerror.discordutils.commands.discordutils;
+package md.mirrerror.discordutils.commands.discordutilsadmin;
 
+import md.mirrerror.discordutils.Main;
 import md.mirrerror.discordutils.commands.SubCommand;
 import md.mirrerror.discordutils.config.Message;
 import org.bukkit.command.Command;
@@ -8,26 +9,29 @@ import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Help implements SubCommand {
+public class Reload implements SubCommand {
+
     @Override
     public void onCommand(CommandSender sender, Command command, String label, String[] args) {
-        Message.HELP.getStringList().forEach(sender::sendMessage);
+        Main.getInstance().getConfigManager().reloadConfigFiles();
+        Message.CONFIG_FILES_RELOADED.getFormattedText(true).forEach(sender::sendMessage);
     }
 
     @Override
     public String getName() {
-        return "help";
+        return "reload";
     }
 
     @Override
     public String getPermission() {
-        return "discordutils.discordutils.help";
+        return "discordutils.discordutilsadmin.reload";
     }
 
     @Override
     public List<String> getAliases() {
         List<String> aliases = new ArrayList<>();
-        aliases.add("h");
+        aliases.add("rl");
+        aliases.add("rel");
         return aliases;
     }
 }

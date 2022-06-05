@@ -1,9 +1,8 @@
 package md.mirrerror.discordutils.discord;
 
 import md.mirrerror.discordutils.Main;
-import md.mirrerror.discordutils.discord.listeners.ConsoleCommandsListener;
 import md.mirrerror.discordutils.discord.listeners.EventListener;
-import md.mirrerror.discordutils.discord.listeners.MentionsListener;
+import md.mirrerror.discordutils.discord.listeners.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -13,7 +12,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import javax.security.auth.login.LoginException;
-import java.time.LocalDateTime;
 import java.util.*;
 
 public class BotController {
@@ -30,7 +28,6 @@ public class BotController {
     private static final Map<Player, String> twoFactorPlayers = new HashMap<>();
     private static final Map<String, Integer> twoFactorAttempts = new HashMap<>(); // ip, attempts
     private static final Map<UUID, TwoFactorSession> sessions = new HashMap<>();
-    private static final Map<User, LocalDateTime> voiceTime = new HashMap<>();
     private static final Map<Player, Message> unlinkPlayers = new HashMap<>();
 
     private static List<Long> rewardBlacklistedVoiceChannels = new ArrayList<>();
@@ -46,6 +43,7 @@ public class BotController {
             jda = JDABuilder.create(gatewayIntents)
                             .setMemberCachePolicy(MemberCachePolicy.ALL)
                             .addEventListeners(new EventListener())
+                            .addEventListeners(new BotCommandsListener())
                             .setAutoReconnect(true)
                             .setToken(token)
                             .setContextEnabled(false)
@@ -65,8 +63,10 @@ public class BotController {
             setupGroupRoles();
             setupAdminRoles();
 
-            rewardBlacklistedVoiceChannels = Main.getInstance().getConfigManager().getConfig().getLongList("Discord.GuildVoiceRewards.BlacklistedChannels");
-            virtualConsoleBlacklistedCommands = Main.getInstance().getConfigManager().getConfig().getStringList("Discord.Console.BlacklistedCommands");
+            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.GuildVoiceRewards.Enabled")) {
+                rewardBlacklistedVoiceChannels = Main.getInstance().getConfigManager().getConfig().getLongList("Discord.GuildVoiceRewards.BlacklistedChannels");
+                jda.addEventListener(new VoiceRewardsListener());
+            }
 
             if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.Activities.Enabled")) {
                 setupActivityChanger();
@@ -83,7 +83,22 @@ public class BotController {
             }
 
             if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.Console.Enabled")) {
+                virtualConsoleBlacklistedCommands = Main.getInstance().getConfigManager().getConfig().getStringList("Discord.Console.BlacklistedCommands");
                 consoleLoggingTextChannel = jda.getTextChannelById(Main.getInstance().getConfigManager().getConfig().getLong("Discord.Console.ChannelId"));
+                if(consoleLoggingTextChannel == null) {
+                    Main.getInstance().getLogger().severe("Failed to setup the virtual console, because you've set a wrong channel id for it. Check your config.yml.");
+                    return;
+                }
+
+                if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.Console.ClearOnEveryInit")) {
+                    TextChannel textChannel = consoleLoggingTextChannel.createCopy().complete();
+                    consoleLoggingTextChannel.delete().queue();
+                    consoleLoggingTextChannel = textChannel;
+
+                    Main.getInstance().getConfigManager().getConfig().set("Discord.Console.ChannelId", consoleLoggingTextChannel.getIdLong());
+                    Main.getInstance().getConfigManager().saveConfigFiles();
+                }
+
                 ConsoleLoggingManager consoleLoggingManager = new ConsoleLoggingManager();
                 consoleLoggingManager.initialize();
                 jda.addEventListener(new ConsoleCommandsListener());
@@ -168,10 +183,6 @@ public class BotController {
 
     public static Map<UUID, TwoFactorSession> getSessions() {
         return sessions;
-    }
-
-    public static Map<User, LocalDateTime> getVoiceTime() {
-        return voiceTime;
     }
 
     public static List<Long> getRewardBlacklistedVoiceChannels() {

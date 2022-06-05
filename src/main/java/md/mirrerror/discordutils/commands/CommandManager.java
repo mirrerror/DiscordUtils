@@ -25,7 +25,7 @@ public class CommandManager implements CommandExecutor {
             }
             boolean hasSubCommand = false;
             if(args.length >= 1) for(SubCommand subCommand : commands.get(command.getName())) {
-                if(subCommand.getName().equals(args[0])) {
+                if(subCommand.getName().equals(args[0]) || subCommand.getAliases().contains(args[0])) {
                     hasSubCommand = true;
                     if(sender.hasPermission(subCommand.getPermission())) {
                         subCommand.onCommand(sender, command, label, newArgs);

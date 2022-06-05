@@ -73,9 +73,12 @@
 # List of the allowed commands before passing 2FA
 # ------------------------------------------------------------------
 # ActionsAfterFailing2FA
-# List of the actions that will be performed after the player fails 2FA n times
+# List of the actions that will be performed after the player fails 2FA n times (for 2FA type code only)
 # Messages - messages that are sent when the player fails 2FA n times
 # Commands - commands that are executed when the player fails 2FA n times
+# ------------------------------------------------------------------
+# CommandsAfter2FADecline
+# Commands that are performed after the account owner declines the authorization of his account from Discord (%player% - placeholder for the player nickname) (for 2FA type reaction only)
 # ------------------------------------------------------------------
 # CommandsAfterVerification
 # Commands that are performed after the player verify his account (%player% - placeholder for the player nickname)
@@ -102,6 +105,7 @@
 # Time - minimum time for achieving the reward (in seconds)
 # Reward - command that is executed if the player reach the minimum time (executes multiple times if the minimum time is played by player more than one time)
 # BlacklistedChannels - ignored channel IDs. For example: BlacklistedChannels: [905508941230915684, 123123123131231233]
+# MinMembers - the minimum amount of members that has to be in a voice channel to get the rewards
 # ------------------------------------------------------------------
 # MessagesChannel
 # Whether to enable or not the possibility to send messages to Discord from the game (/du sendtodiscord)
@@ -120,6 +124,7 @@
 # Console
 # Whether to enable or not the virtual console in the specified Discord channel
 # Enabled - true - enable, false - disable
+# ClearOnEveryInit - whether to clear the virtual console channel on every initialization or not
 # ChannelId - text channel ID, in which will appear the console messages
 # BlacklistedCommands - commands that can't be executed from the virtual console
 # ------------------------------------------------------------------
@@ -195,6 +200,7 @@ Discord:
       Messages: []
       Commands:
         - 'banip %player% 30m Suspicious activity.'
+  CommandsAfter2FADecline: []
   CommandsAfterVerification: []
   CommandsAfterUnlink: []
   CommandsAfterServerBoosting: []
@@ -209,6 +215,7 @@ Discord:
     Time: 600
     Reward: 'eco give %player% 100'
     BlacklistedChannels: []
+    MinMembers: 1
   MessagesChannel:
     Enabled: false
     Id: -1
@@ -221,6 +228,7 @@ Discord:
     ChatEmbedColor: '#e8d725'
   Console:
     Enabled: false
+    ClearOnEveryInit: true
     ChannelId: -1
     BlacklistedCommands: []
   NotifyAboutMentions:

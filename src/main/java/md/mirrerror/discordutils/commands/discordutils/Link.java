@@ -11,6 +11,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Link implements SubCommand {
     @Override
     public void onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -66,5 +69,10 @@ public class Link implements SubCommand {
     @Override
     public String getPermission() {
         return "discordutils.discordutils.link";
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return new ArrayList<>();
     }
 }

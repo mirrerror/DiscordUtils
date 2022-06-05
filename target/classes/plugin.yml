@@ -1,5 +1,5 @@
 name: DiscordUtils
-version: '2.9.1'
+version: '3.0'
 main: md.mirrerror.discordutils.Main
 author: 'mirrerror'
 softdepend:
@@ -13,3 +13,11 @@ commands:
     aliases:
       - 'disutils'
       - 'du'
+  discordutilsadmin:
+    usage: ''
+    description: ''
+    aliases:
+      - 'disutilsadmin'
+      - 'disutilsadm'
+      - 'disutilsa'
+      - 'dua'

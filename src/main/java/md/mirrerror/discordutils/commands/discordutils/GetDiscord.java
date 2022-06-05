@@ -10,6 +10,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GetDiscord implements SubCommand {
 
     @Override
@@ -46,6 +49,15 @@ public class GetDiscord implements SubCommand {
     @Override
     public String getPermission() {
         return "discordutils.discordutils.getdiscord";
+    }
+
+    @Override
+    public List<String> getAliases() {
+        List<String> aliases = new ArrayList<>();
+        aliases.add("gdis");
+        aliases.add("gdiscord");
+        aliases.add("gd");
+        return aliases;
     }
 
 }
