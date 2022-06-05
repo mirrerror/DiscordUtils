@@ -44,6 +44,7 @@ public class BotController {
                             .setMemberCachePolicy(MemberCachePolicy.ALL)
                             .addEventListeners(new EventListener())
                             .addEventListeners(new BotCommandsListener())
+                            .addEventListeners(new BoostListener())
                             .setAutoReconnect(true)
                             .setToken(token)
                             .setContextEnabled(false)

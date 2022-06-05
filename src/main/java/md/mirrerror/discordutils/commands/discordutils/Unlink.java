@@ -10,7 +10,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Unlink implements SubCommand {
@@ -56,8 +56,6 @@ public class Unlink implements SubCommand {
 
     @Override
     public List<String> getAliases() {
-        List<String> aliases = new ArrayList<>();
-        aliases.add("ulink");
-        return aliases;
+        return Collections.singletonList("ulink");
     }
 }

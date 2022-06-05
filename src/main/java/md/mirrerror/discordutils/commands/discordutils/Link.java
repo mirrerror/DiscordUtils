@@ -11,7 +11,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Link implements SubCommand {
@@ -46,16 +46,18 @@ public class Link implements SubCommand {
 
             Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".2factor", defaultValue);
             Main.getInstance().getConfigManager().saveConfigFiles();
-            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.VerifiedRole.Enabled")) {
-                long roleId = Main.getInstance().getConfigManager().getConfig().getLong("Discord.VerifiedRole.Id");
-                if(roleId > 0) {
-                    BotController.getJda().getGuilds().forEach(guild -> {
-                        Role verifiedRole = DiscordUtils.getVerifiedRole(guild);
-                        if(verifiedRole != null) guild.addRoleToMember(guild.retrieveMember(BotController.getLinkCodes().get(args[0])).complete(), verifiedRole).queue();
-                    });
-                }
+        }
+
+        if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.VerifiedRole.Enabled")) {
+            long roleId = Main.getInstance().getConfigManager().getConfig().getLong("Discord.VerifiedRole.Id");
+            if(roleId > 0) {
+                BotController.getJda().getGuilds().forEach(guild -> {
+                    Role verifiedRole = DiscordUtils.getVerifiedRole(guild);
+                    if(verifiedRole != null) guild.addRoleToMember(guild.retrieveMember(BotController.getLinkCodes().get(args[0])).complete(), verifiedRole).queue();
+                });
             }
         }
+
         BotController.getLinkCodes().remove(args[0]);
         Message.ACCOUNT_SUCCESSFULLY_LINKED.getFormattedText(true).forEach(sender::sendMessage);
         Main.getInstance().getConfigManager().getConfig().getStringList("Discord.CommandsAfterVerification").forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName())));
@@ -73,6 +75,6 @@ public class Link implements SubCommand {
 
     @Override
     public List<String> getAliases() {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 }

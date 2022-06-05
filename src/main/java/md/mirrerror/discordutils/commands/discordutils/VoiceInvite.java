@@ -17,7 +17,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -71,11 +72,6 @@ public class VoiceInvite implements SubCommand {
 
     @Override
     public List<String> getAliases() {
-        List<String> aliases = new ArrayList<>();
-        aliases.add("vinvite");
-        aliases.add("vcinvite");
-        aliases.add("vinv");
-        aliases.add("vcinv");
-        return aliases;
+        return Collections.unmodifiableList(Arrays.asList("vinvite", "vcinvite", "vinv", "vcinv"));
     }
 }

@@ -6,7 +6,8 @@ import md.mirrerror.discordutils.config.Message;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Reload implements SubCommand {
@@ -29,9 +30,6 @@ public class Reload implements SubCommand {
 
     @Override
     public List<String> getAliases() {
-        List<String> aliases = new ArrayList<>();
-        aliases.add("rl");
-        aliases.add("rel");
-        return aliases;
+        return Collections.unmodifiableList(Arrays.asList("rl", "rel"));
     }
 }

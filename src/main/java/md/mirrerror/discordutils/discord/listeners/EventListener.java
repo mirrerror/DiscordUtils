@@ -9,18 +9,14 @@ import md.mirrerror.discordutils.discord.TwoFactorSession;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateBoostTimeEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 
 public class EventListener extends ListenerAdapter {
 
@@ -90,28 +86,6 @@ public class EventListener extends ListenerAdapter {
 
                 event.getChannel().deleteMessageById(event.getMessageId()).queue();
             }
-        }
-    }
-
-    @Override
-    public void onGuildMemberUpdateBoostTime(@NotNull GuildMemberUpdateBoostTimeEvent event) {
-        OffsetDateTime newTime = event.getNewTimeBoosted();
-        OffsetDateTime oldTime = event.getOldTimeBoosted();
-        if(newTime == null || oldTime == null) {
-            Main.getInstance().getLogger().severe("An error occurred while handling the GuildMemberUpdateBoostTimeEvent! Please, contact the developer!");
-            return;
-        }
-
-        if(newTime.isAfter(oldTime)) {
-            Member member = event.getEntity();
-            User user = member.getUser();
-            if(DiscordUtils.isVerified(user)) return;
-
-            OfflinePlayer offlinePlayer = DiscordUtils.getOfflinePlayer(user);
-            Main.getInstance().getConfigManager().getConfig().getStringList("Discord.CommandsAfterServerBoosting").forEach(command -> {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", offlinePlayer.getName()).replace("%user%", user.getAsTag()));
-            });
-
         }
     }
 

@@ -104,7 +104,6 @@ public final class Main extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        //Bukkit.getScheduler().getPendingTasks().forEach(BukkitTask::cancel);
         BotController.getJda().shutdownNow();
     }
 

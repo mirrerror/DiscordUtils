@@ -15,7 +15,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ForceUnlink implements SubCommand {
@@ -85,11 +86,7 @@ public class ForceUnlink implements SubCommand {
 
     @Override
     public List<String> getAliases() {
-        List<String> aliases = new ArrayList<>();
-        aliases.add("funlink");
-        aliases.add("fulink");
-        aliases.add("forceulink");
-        return aliases;
+        return Collections.unmodifiableList(Arrays.asList("funlink", "fulink", "forceulink"));
     }
 
 }

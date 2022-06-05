@@ -10,8 +10,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class SendToDiscord implements SubCommand {
     @Override
@@ -67,11 +67,6 @@ public class SendToDiscord implements SubCommand {
 
     @Override
     public java.util.List<String> getAliases() {
-        List<String> aliases = new ArrayList<>();
-        aliases.add("sendtodis");
-        aliases.add("std");
-        aliases.add("stodis");
-        aliases.add("stdis");
-        return aliases;
+        return Collections.unmodifiableList(Arrays.asList("sendtodis", "std", "stodis", "stdis"));
     }
 }

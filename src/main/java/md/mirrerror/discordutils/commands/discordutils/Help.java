@@ -5,7 +5,7 @@ import md.mirrerror.discordutils.config.Message;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Help implements SubCommand {
@@ -26,8 +26,6 @@ public class Help implements SubCommand {
 
     @Override
     public List<String> getAliases() {
-        List<String> aliases = new ArrayList<>();
-        aliases.add("h");
-        return aliases;
+        return Collections.singletonList("h");
     }
 }

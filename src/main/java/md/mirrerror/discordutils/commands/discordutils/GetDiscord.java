@@ -10,7 +10,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class GetDiscord implements SubCommand {
@@ -53,11 +54,7 @@ public class GetDiscord implements SubCommand {
 
     @Override
     public List<String> getAliases() {
-        List<String> aliases = new ArrayList<>();
-        aliases.add("gdis");
-        aliases.add("gdiscord");
-        aliases.add("gd");
-        return aliases;
+        return Collections.unmodifiableList(Arrays.asList("gdis", "gdiscord", "gd"));
     }
 
 }
