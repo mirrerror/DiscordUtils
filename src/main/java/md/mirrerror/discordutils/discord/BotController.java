@@ -5,6 +5,7 @@ import md.mirrerror.discordutils.discord.listeners.EventListener;
 import md.mirrerror.discordutils.discord.listeners.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -20,7 +21,7 @@ public class BotController {
     private static List<Long> adminRoles;
 
     private static JDA jda;
-    private String botPrefix = Main.getInstance().getConfigManager().getConfig().getString("Discord.BotPrefix");
+    private String botPrefix = Main.getInstance().getConfigManager().getBotSettings().getString("BotPrefix");
 
     private static final List<GatewayIntent> gatewayIntents = new ArrayList<>();
 
@@ -49,6 +50,7 @@ public class BotController {
                             .setToken(token)
                             .setContextEnabled(false)
                             .setBulkDeleteSplittingEnabled(false)
+                            .setStatus(OnlineStatus.fromKey(Main.getInstance().getConfigManager().getBotSettings().getString("OnlineStatus")))
                             .build();
             jda.awaitReady();
 
@@ -64,39 +66,39 @@ public class BotController {
             setupGroupRoles();
             setupAdminRoles();
 
-            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.GuildVoiceRewards.Enabled")) {
-                rewardBlacklistedVoiceChannels = Main.getInstance().getConfigManager().getConfig().getLongList("Discord.GuildVoiceRewards.BlacklistedChannels");
+            if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("GuildVoiceRewards.Enabled")) {
+                rewardBlacklistedVoiceChannels = Main.getInstance().getConfigManager().getBotSettings().getLongList("GuildVoiceRewards.BlacklistedChannels");
                 jda.addEventListener(new VoiceRewardsListener());
             }
 
-            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.Activities.Enabled")) {
+            if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("Activities.Enabled")) {
                 setupActivityChanger();
             }
-            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.DelayedRolesCheck.Enabled") && Main.getPermissionsPlugin() != Main.PermissionsPlugin.NONE) {
+            if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("RolesSynchronization.Enabled") && Main.getPermissionsPlugin() != Main.PermissionsPlugin.NONE) {
                 DiscordUtils.setupDelayedRolesCheck();
             }
-            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.DelayedNamesCheck.Enabled")) {
+            if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("NamesSynchronization.Enabled")) {
                 DiscordUtils.setupDelayedNamesCheck();
             }
 
-            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.ServerActivityLogging.Enabled")) {
-                serverActivityLoggingTextChannel = jda.getTextChannelById(Main.getInstance().getConfigManager().getConfig().getLong("Discord.ServerActivityLogging.ChannelId"));
+            if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("ServerActivityLogging.Enabled")) {
+                serverActivityLoggingTextChannel = jda.getTextChannelById(Main.getInstance().getConfigManager().getBotSettings().getLong("ServerActivityLogging.ChannelId"));
             }
 
-            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.Console.Enabled")) {
-                virtualConsoleBlacklistedCommands = Main.getInstance().getConfigManager().getConfig().getStringList("Discord.Console.BlacklistedCommands");
-                consoleLoggingTextChannel = jda.getTextChannelById(Main.getInstance().getConfigManager().getConfig().getLong("Discord.Console.ChannelId"));
+            if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("Console.Enabled")) {
+                virtualConsoleBlacklistedCommands = Main.getInstance().getConfigManager().getBotSettings().getStringList("Console.BlacklistedCommands");
+                consoleLoggingTextChannel = jda.getTextChannelById(Main.getInstance().getConfigManager().getBotSettings().getLong("Console.ChannelId"));
                 if(consoleLoggingTextChannel == null) {
                     Main.getInstance().getLogger().severe("Failed to setup the virtual console, because you've set a wrong channel id for it. Check your config.yml.");
                     return;
                 }
 
-                if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.Console.ClearOnEveryInit")) {
+                if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("Console.ClearOnEveryInit")) {
                     TextChannel textChannel = consoleLoggingTextChannel.createCopy().complete();
                     consoleLoggingTextChannel.delete().queue();
                     consoleLoggingTextChannel = textChannel;
 
-                    Main.getInstance().getConfigManager().getConfig().set("Discord.Console.ChannelId", consoleLoggingTextChannel.getIdLong());
+                    Main.getInstance().getConfigManager().getBotSettings().set("Console.ChannelId", consoleLoggingTextChannel.getIdLong());
                     Main.getInstance().getConfigManager().saveConfigFiles();
                 }
 
@@ -105,7 +107,7 @@ public class BotController {
                 jda.addEventListener(new ConsoleCommandsListener());
             }
 
-            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.NotifyAboutMentions.Enabled")) {
+            if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("NotifyAboutMentions.Enabled")) {
                 jda.addEventListener(new MentionsListener());
             }
 
@@ -118,13 +120,13 @@ public class BotController {
 
     public static void setupGroupRoles() {
         groupRoles = new HashMap<>();
-        for(String s : Main.getInstance().getConfigManager().getConfig().getConfigurationSection("Discord.GroupRoles").getKeys(false)) {
-            groupRoles.put(Long.parseLong(s), Main.getInstance().getConfigManager().getConfig().getString("Discord.GroupRoles." + s));
+        for(String s : Main.getInstance().getConfigManager().getBotSettings().getConfigurationSection("GroupRoles").getKeys(false)) {
+            groupRoles.put(Long.parseLong(s), Main.getInstance().getConfigManager().getBotSettings().getString("GroupRoles." + s));
         }
     }
 
     public static void setupAdminRoles() {
-        adminRoles = Main.getInstance().getConfigManager().getConfig().getLongList("Discord.AdminRoles");
+        adminRoles = Main.getInstance().getConfigManager().getBotSettings().getLongList("AdminRoles");
     }
 
     public static void setupActivityChanger() {
@@ -135,7 +137,7 @@ public class BotController {
 
         } else {
 
-            long updateDelay = Main.getInstance().getConfigManager().getConfig().getLong("Discord.Activities.UpdateDelay");
+            long updateDelay = Main.getInstance().getConfigManager().getBotSettings().getLong("Activities.UpdateDelay");
             Bukkit.getScheduler().runTaskTimer(Main.getInstance(), () -> {
                 Activity activity = Main.getInstance().getActivityManager().nextActivity();
                 jda.getPresence().setActivity(Activity.of(activity.getType(), Main.getInstance().getPapiManager().setPlaceholders(null, activity.getName())));

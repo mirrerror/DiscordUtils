@@ -55,6 +55,13 @@ EMBED_FOOTER: 'Bot by mirrerror#7777'
 STATS_FORMAT:
   - 'Nickname: %player_name%'
   - 'Last join date: %player_last_join_date%'
+DISCORD_HELP:
+  - '**Available commands:**'
+  - '**!link** — link your Discord account with your in-game account'
+  - '**!online** — check your current server online'
+  - '**!stats [player]** — check your or other player''s stats (if you don''t specify a player, it will output your stats)'
+  - '**!sudo [command]** — execute a server command as a console sender (admins only)'
+  - '**!embed [title] [color] [text]** — send an embed message (admins only)'
 HELP:
   - '&9DiscordUtils&f plugin help:'
   - '&7-&b /du help&f - help command'

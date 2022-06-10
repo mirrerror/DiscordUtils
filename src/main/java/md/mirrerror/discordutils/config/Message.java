@@ -65,6 +65,7 @@ public enum Message {
     SUCCESSFULLY,
     EMBED_FOOTER,
     STATS_FORMAT,
+    DISCORD_HELP,
     HELP,
 
     CHAT_LOGGING_EMBED_TITLE,

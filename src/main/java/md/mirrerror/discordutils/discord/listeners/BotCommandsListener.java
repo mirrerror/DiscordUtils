@@ -5,7 +5,7 @@ import md.mirrerror.discordutils.config.Message;
 import md.mirrerror.discordutils.discord.BotController;
 import md.mirrerror.discordutils.discord.DiscordUtils;
 import md.mirrerror.discordutils.discord.EmbedManager;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -20,12 +20,14 @@ public class BotCommandsListener extends ListenerAdapter {
     private final EmbedManager embedManager = new EmbedManager();
 
     @Override
-    public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+    public void onMessageReceived(MessageReceivedEvent event) {
         if(event.getAuthor().isBot() || event.isWebhookMessage()) return;
         if(!event.getMessage().getContentRaw().startsWith(botController.getBotPrefix())) return;
-        List<Long> botCommandTextChannels = Main.getInstance().getConfigManager().getConfig().getLongList("Discord.BotCommandTextChannels");
+        if(!event.isFromGuild()) return;
+
+        List<Long> botCommandTextChannels = Main.getInstance().getConfigManager().getBotSettings().getLongList("BotCommandTextChannels");
         if(!botCommandTextChannels.isEmpty()) {
-            if(!Main.getInstance().getConfigManager().getConfig().getLongList("Discord.BotCommandTextChannels").contains(event.getChannel().getIdLong())) return;
+            if(!Main.getInstance().getConfigManager().getBotSettings().getLongList("BotCommandTextChannels").contains(event.getChannel().getIdLong())) return;
         }
         String[] args = event.getMessage().getContentRaw().replaceFirst(botController.getBotPrefix(), "").split(" ");
 
@@ -134,6 +136,17 @@ public class BotCommandsListener extends ListenerAdapter {
                 messageToSend = Main.getInstance().getPapiManager().setPlaceholders(player, messageToSend);
 
                 event.getChannel().sendMessageEmbeds(embedManager.infoEmbed(messageToSend)).queue();
+                break;
+            }
+            case "help": {
+
+                String messageToSend = "";
+                for (String s : Message.DISCORD_HELP.getStringList()) {
+                    messageToSend += s + "\n";
+                }
+
+                event.getChannel().sendMessageEmbeds(embedManager.infoEmbed(messageToSend)).queue();
+
                 break;
             }
         }

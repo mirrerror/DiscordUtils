@@ -74,10 +74,10 @@ public final class Main extends JavaPlugin {
         papiManager = new PAPIManager();
         activityManager = new ActivityManager();
         getLogger().info("ActivityManager has been successfully enabled.");
-        if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.AsyncBotLoading")) {
-            Bukkit.getScheduler().runTaskAsynchronously(this, () -> BotController.setupBot(configManager.getConfig().getString("Discord.BotToken")));
+        if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("AsyncBotLoading")) {
+            Bukkit.getScheduler().runTaskAsynchronously(this, () -> BotController.setupBot(configManager.getBotSettings().getString("BotToken")));
         } else {
-            BotController.setupBot(configManager.getConfig().getString("Discord.BotToken"));
+            BotController.setupBot(configManager.getBotSettings().getString("BotToken"));
         }
         checkOutForPermissionsPlugin();
         if(permissionsPlugin != PermissionsPlugin.NONE) getLogger().info("Successfully integrated with " + permissionsPlugin.name() + ".");
@@ -85,7 +85,7 @@ public final class Main extends JavaPlugin {
         registerCommands();
         getLogger().info("Commands have been successfully loaded.");
         Bukkit.getPluginManager().registerEvents(new Events(), this);
-        if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.ServerActivityLogging.Enabled")) {
+        if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("ServerActivityLogging.Enabled")) {
             Bukkit.getPluginManager().registerEvents(new ServerActivityLoggerHandler(), this);
         }
         getLogger().info("Events have been successfully loaded.");
@@ -135,7 +135,7 @@ public final class Main extends JavaPlugin {
     }
 
     private void setupTwoFactorType() {
-        String type = configManager.getConfig().getString("Discord.2FAType").toUpperCase();
+        String type = configManager.getBotSettings().getString("2FAType").toUpperCase();
         switch (type) {
             case "CODE":
             case "REACTION": {

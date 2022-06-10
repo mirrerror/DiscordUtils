@@ -40,7 +40,7 @@ public class EventListener extends ListenerAdapter {
                         Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId(), null);
                         Main.getInstance().getConfigManager().saveConfigFiles();
 
-                        long roleId = Main.getInstance().getConfigManager().getConfig().getLong("Discord.VerifiedRole.Id");
+                        long roleId = Main.getInstance().getConfigManager().getBotSettings().getLong("VerifiedRole.Id");
                         if(roleId > 0) {
                             BotController.getJda().getGuilds().forEach(guild -> {
                                 Role verifiedRole = DiscordUtils.getVerifiedRole(guild);
@@ -55,7 +55,7 @@ public class EventListener extends ListenerAdapter {
                     BotController.getUnlinkPlayers().remove(player);
                     Message.ACCOUNT_SUCCESSFULLY_UNLINKED.getFormattedText(true).forEach(player::sendMessage);
                     Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
-                        Main.getInstance().getConfigManager().getConfig().getStringList("Discord.CommandsAfterUnlink").forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName())));
+                        Main.getInstance().getConfigManager().getBotSettings().getStringList("CommandsAfterUnlink").forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName())));
                     });
                 }
                 if(event.getReaction().getReactionEmote().getName().equals("❎")) {
@@ -74,13 +74,16 @@ public class EventListener extends ListenerAdapter {
                     BotController.getTwoFactorPlayers().remove(player);
                     player.sendMessage(Message.TWOFACTOR_AUTHORIZED.getText(true));
                     BotController.getSessions().put(player.getUniqueId(), new TwoFactorSession(StringUtils.remove(player.getAddress().getAddress().toString(), '/'),
-                            LocalDateTime.now().plusSeconds(Main.getInstance().getConfigManager().getConfig().getLong("Discord.2FASessionTime"))));
+                            LocalDateTime.now().plusSeconds(Main.getInstance().getConfigManager().getBotSettings().getLong("2FASessionTime"))));
+                    Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
+                        Main.getInstance().getConfigManager().getBotSettings().getStringList("CommandsAfter2FAPassing").forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName())));
+                    });
                 }
                 if(event.getReaction().getReactionEmote().getName().equals("❎")) {
                     BotController.getTwoFactorPlayers().remove(player);
                     Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
                         player.kickPlayer(Message.TWOFACTOR_REJECTED.getText());
-                        Main.getInstance().getConfigManager().getConfig().getStringList("Discord.CommandsAfter2FADecline").forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName())));
+                        Main.getInstance().getConfigManager().getBotSettings().getStringList("CommandsAfter2FADeclining").forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName())));
                     });
                 }
 

@@ -1,29 +1,22 @@
 package md.mirrerror.discordutils.config;
 
-import md.mirrerror.discordutils.Main;
+import md.mirrerror.discordutils.config.customconfigs.*;
 import md.mirrerror.discordutils.discord.BotController;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-
-import java.io.File;
-import java.io.IOException;
 
 public class ConfigManager {
-
-    private File configFile;
-    private FileConfiguration config;
-    private File dataFile;
-    private FileConfiguration dataConfig;
-    private File langFile;
-    private FileConfiguration langConfig;
 
     public ConfigManager() {
         initializeConfigFiles();
     }
 
+    private CustomConfig config;
+    private CustomConfig botSettings;
+    private CustomConfig data;
+    private CustomConfig lang;
+
     public void initializeConfigFiles() {
-        configFile = new File(Main.getInstance().getDataFolder(), "config.yml");
+    /*    configFile = new File(Main.getInstance().getDataFolder(), "config.yml");
         if(!configFile.exists()) {
             configFile.getParentFile().mkdirs();
             Main.getInstance().saveResource(configFile.getName(), false);
@@ -52,48 +45,44 @@ public class ConfigManager {
         } catch (IOException | InvalidConfigurationException e) {
             Main.getInstance().getLogger().severe("Something went wrong while initializing the config files!");
             Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
-        }
+        }*/
+
+        config = new MainConfig("config.yml");
+        botSettings = new BotSettingsConfig("bot_settings.yml");
+        data = new DataConfig("data.yml");
+        lang = new LangConfig("lang.yml");
     }
 
     public void saveConfigFiles() {
-        try {
-            config.save(configFile);
-            dataConfig.save(dataFile);
-            langConfig.save(langFile);
-            Main.getInstance().getLogger().info("Successfully saved the config files.");
-        } catch (IOException e) {
-            Main.getInstance().getLogger().severe("Something went wrong while saving the config files!");
-            Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
-        }
+        config.saveConfigFile();
+        botSettings.saveConfigFile();
+        data.saveConfigFile();
+        lang.saveConfigFile();
     }
 
     public void reloadConfigFiles() {
-        config = new YamlConfiguration();
-        dataConfig = new YamlConfiguration();
-        langConfig = new YamlConfiguration();
-        try {
-            config.load(configFile);
-            dataConfig.load(dataFile);
-            langConfig.load(langFile);
-            BotController.setupAdminRoles();
-            BotController.setupGroupRoles();
-            Main.getInstance().getLogger().info("Successfully reloaded the config files.");
-        } catch (IOException | InvalidConfigurationException e) {
-            Main.getInstance().getLogger().severe("Something went wrong while loading the config files!");
-            Main.getInstance().getLogger().severe("Cause: " + e.getCause() + "; message: " + e.getMessage() + ".");
-        }
+        config.reloadConfigFile();
+        botSettings.reloadConfigFile();
+        data.reloadConfigFile();
+        lang.reloadConfigFile();
+        BotController.setupAdminRoles();
+        BotController.setupGroupRoles();
     }
 
     public FileConfiguration getConfig() {
-        return config;
+        return config.getFileConfiguration();
+    }
+
+    public FileConfiguration getBotSettings() {
+        return botSettings.getFileConfiguration();
     }
 
     public FileConfiguration getData() {
-        return dataConfig;
+        return data.getFileConfiguration();
     }
 
     public FileConfiguration getLang() {
-        return langConfig;
+        return lang.getFileConfiguration();
     }
 
 }

@@ -29,7 +29,7 @@ public class BoostListener extends ListenerAdapter {
             if(DiscordUtils.isVerified(user)) return;
 
             OfflinePlayer offlinePlayer = DiscordUtils.getOfflinePlayer(user);
-            Main.getInstance().getConfigManager().getConfig().getStringList("Discord.CommandsAfterServerBoosting").forEach(command -> {
+            Main.getInstance().getConfigManager().getBotSettings().getStringList("CommandsAfterServerBoosting").forEach(command -> {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", offlinePlayer.getName()).replace("%user%", user.getAsTag()));
             });
 

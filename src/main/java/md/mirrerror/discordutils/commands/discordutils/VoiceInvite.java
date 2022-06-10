@@ -5,6 +5,7 @@ import md.mirrerror.discordutils.commands.SubCommand;
 import md.mirrerror.discordutils.config.Message;
 import md.mirrerror.discordutils.discord.BotController;
 import md.mirrerror.discordutils.discord.DiscordUtils;
+import net.dv8tion.jda.api.entities.IInviteContainer;
 import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -46,7 +47,8 @@ public class VoiceInvite implements SubCommand {
                         return;
                     }
 
-                    Invite invite = member.getVoiceState().getChannel().createInvite().setMaxAge(15L, TimeUnit.MINUTES).complete();
+                    Invite invite = ((IInviteContainer) member.getVoiceState().getChannel()).createInvite().setMaxAge(15L, TimeUnit.MINUTES).complete();
+
                     String url = invite.getUrl();
 
                     TextComponent textComponent = new TextComponent(Message.VOICE_INVITE.getText(true).replace("%sender%", player.getName()));

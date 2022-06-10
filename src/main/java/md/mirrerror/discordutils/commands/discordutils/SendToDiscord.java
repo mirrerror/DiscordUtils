@@ -16,7 +16,7 @@ import java.util.Collections;
 public class SendToDiscord implements SubCommand {
     @Override
     public void onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(!Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.MessagesChannel.Enabled")) {
+        if(!Main.getInstance().getConfigManager().getBotSettings().getBoolean("MessagesChannel.Enabled")) {
             Message.COMMAND_DISABLED.getFormattedText(true).forEach(sender::sendMessage);
             return;
         }
@@ -24,7 +24,7 @@ public class SendToDiscord implements SubCommand {
             Message.DISCORDUTILS_SENDTODISCORD_USAGE.getFormattedText(true).forEach(sender::sendMessage);
             return;
         }
-        long channelId = Main.getInstance().getConfigManager().getConfig().getLong("Discord.MessagesChannel.Id");
+        long channelId = Main.getInstance().getConfigManager().getBotSettings().getLong("MessagesChannel.Id");
         if(channelId <= 0) {
             Main.getInstance().getLogger().severe("You have set an invalid id for the messages TextChannel (id: " + channelId + "). Check your config.yml.");
             return;

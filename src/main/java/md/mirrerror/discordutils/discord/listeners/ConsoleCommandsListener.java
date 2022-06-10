@@ -6,7 +6,7 @@ import md.mirrerror.discordutils.discord.BotController;
 import md.mirrerror.discordutils.discord.DiscordUtils;
 import md.mirrerror.discordutils.discord.EmbedManager;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
@@ -16,9 +16,11 @@ public class ConsoleCommandsListener extends ListenerAdapter {
     private final EmbedManager embedManager = new EmbedManager();
 
     @Override
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if(event.getAuthor().isBot() || event.isWebhookMessage()) return;
-        TextChannel textChannel = event.getChannel();
+        if(!event.isFromGuild()) return;
+
+        TextChannel textChannel = event.getTextChannel();
 
         if(!textChannel.getId().equals(BotController.getConsoleLoggingTextChannel().getId())) return;
         if(!DiscordUtils.isAdmin(event.getMember())) {

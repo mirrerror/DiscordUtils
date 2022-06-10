@@ -13,7 +13,7 @@ public class EmbedManager {
 
     public MessageEmbed errorEmbed(String text) {
         embedBuilder.setTitle(Message.ERROR.getText());
-        embedBuilder.setColor(Color.decode(Main.getInstance().getConfigManager().getConfig().getString("Discord.ErrorEmbedColor")));
+        embedBuilder.setColor(Color.decode(Main.getInstance().getConfigManager().getBotSettings().getString("ErrorEmbedColor")));
         embedBuilder.setDescription(text);
         embedBuilder.setFooter(FOOTER);
         return embedBuilder.build();
@@ -21,7 +21,7 @@ public class EmbedManager {
 
     public MessageEmbed successfulEmbed(String text) {
         embedBuilder.setTitle(Message.SUCCESSFULLY.getText());
-        embedBuilder.setColor(Color.decode(Main.getInstance().getConfigManager().getConfig().getString("Discord.SuccessfulEmbedColor")));
+        embedBuilder.setColor(Color.decode(Main.getInstance().getConfigManager().getBotSettings().getString("SuccessfulEmbedColor")));
         embedBuilder.setDescription(text);
         embedBuilder.setFooter(FOOTER);
         return embedBuilder.build();
@@ -29,7 +29,7 @@ public class EmbedManager {
 
     public MessageEmbed infoEmbed(String text) {
         embedBuilder.setTitle(Message.INFORMATION.getText());
-        embedBuilder.setColor(Color.decode(Main.getInstance().getConfigManager().getConfig().getString("Discord.InformationEmbedColor")));
+        embedBuilder.setColor(Color.decode(Main.getInstance().getConfigManager().getBotSettings().getString("InformationEmbedColor")));
         embedBuilder.setDescription(text);
         embedBuilder.setFooter(FOOTER);
         return embedBuilder.build();

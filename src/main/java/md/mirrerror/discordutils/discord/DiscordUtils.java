@@ -149,7 +149,7 @@ public class DiscordUtils {
     }
 
     public static Role getVerifiedRole(Guild guild) {
-        long roleId = Main.getInstance().getConfigManager().getConfig().getLong("Discord.VerifiedRole.Id");
+        long roleId = Main.getInstance().getConfigManager().getBotSettings().getLong("VerifiedRole.Id");
         if(roleId > 0) return guild.getRoleById(roleId);
         return null;
     }
@@ -210,7 +210,8 @@ public class DiscordUtils {
                 Member member = guild.getMember(user);
                 if(member == null) return;
                 if(!guild.getMember(BotController.getJda().getSelfUser()).canInteract(member)) return;
-                member.modifyNickname(offlinePlayer.getName()).queue();
+                member.modifyNickname(Main.getInstance().getConfigManager().getBotSettings().getString("NamesSyncFormat")
+                        .replace("%player%", offlinePlayer.getName())).queue();
             }
         });
     }
@@ -248,7 +249,7 @@ public class DiscordUtils {
                 });
             }
 
-        }.runTaskTimerAsynchronously(Main.getInstance(), 0L, Main.getInstance().getConfigManager().getConfig().getInt("Discord.DelayedRolesCheck.Delay")*20L);
+        }.runTaskTimerAsynchronously(Main.getInstance(), 0L, Main.getInstance().getConfigManager().getBotSettings().getInt("DelayedRolesCheck.Delay")*20L);
 
         Main.getInstance().getLogger().info("Delayed roles check has been successfully enabled.");
     }
@@ -256,7 +257,7 @@ public class DiscordUtils {
     public static void setupDelayedNamesCheck() {
         Bukkit.getScheduler().runTaskTimerAsynchronously(Main.getInstance(), () -> Main.getInstance().getConfigManager().getData().getConfigurationSection("DiscordLink").getKeys(false)
                         .forEach(verified -> checkNames(Bukkit.getOfflinePlayer(UUID.fromString(verified)))),
-                0L, Main.getInstance().getConfigManager().getConfig().getInt("Discord.DelayedNamesCheck.Delay")*20L);
+                0L, Main.getInstance().getConfigManager().getBotSettings().getInt("DelayedNamesCheck.Delay")*20L);
         Main.getInstance().getLogger().info("Delayed names check has been successfully enabled.");
     }
 

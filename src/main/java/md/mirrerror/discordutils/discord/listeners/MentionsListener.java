@@ -4,7 +4,7 @@ import md.mirrerror.discordutils.Main;
 import md.mirrerror.discordutils.discord.DiscordUtils;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -14,37 +14,38 @@ import org.jetbrains.annotations.NotNull;
 public class MentionsListener extends ListenerAdapter {
 
     @Override
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if(event.getAuthor().isBot() || event.isWebhookMessage()) return;
+        if(!event.isFromGuild()) return;
 
-        for(Member member : event.getMessage().getMentionedMembers()) {
+        for(Member member : event.getMessage().getMentions().getMembers()) {
             User user = member.getUser();
             if(!DiscordUtils.isVerified(user)) continue;
 
             Player player = DiscordUtils.getPlayer(user);
             if(player == null) continue;
 
-            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.NotifyAboutMentions.Title.Enabled")) {
-                int fadeIn = Main.getInstance().getConfigManager().getConfig().getInt("Discord.NotifyAboutMentions.Title.FadeIn");
-                int stay = Main.getInstance().getConfigManager().getConfig().getInt("Discord.NotifyAboutMentions.Title.Stay");
-                int fadeOut = Main.getInstance().getConfigManager().getConfig().getInt("Discord.NotifyAboutMentions.Title.FadeOut");
+            if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("NotifyAboutMentions.Title.Enabled")) {
+                int fadeIn = Main.getInstance().getConfigManager().getBotSettings().getInt("NotifyAboutMentions.Title.FadeIn");
+                int stay = Main.getInstance().getConfigManager().getBotSettings().getInt("NotifyAboutMentions.Title.Stay");
+                int fadeOut = Main.getInstance().getConfigManager().getBotSettings().getInt("NotifyAboutMentions.Title.FadeOut");
                 String title = ChatColor.translateAlternateColorCodes('&',
-                        Main.getInstance().getConfigManager().getConfig().getString("Discord.NotifyAboutMentions.Title.Title"));
+                        Main.getInstance().getConfigManager().getBotSettings().getString("NotifyAboutMentions.Title.Title"));
                 String subtitle = ChatColor.translateAlternateColorCodes('&',
-                        Main.getInstance().getConfigManager().getConfig().getString("Discord.NotifyAboutMentions.Title.Subtitle"));
+                        Main.getInstance().getConfigManager().getBotSettings().getString("NotifyAboutMentions.Title.Subtitle"));
 
                 player.sendTitle(title, subtitle, fadeIn, stay, fadeOut);
             }
 
-            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.NotifyAboutMentions.Message.Enabled")) {
+            if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("NotifyAboutMentions.Message.Enabled")) {
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                        Main.getInstance().getConfigManager().getConfig().getString("Discord.NotifyAboutMentions.Message.Text")));
+                        Main.getInstance().getConfigManager().getBotSettings().getString("NotifyAboutMentions.Message.Text")));
             }
 
-            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.NotifyAboutMentions.Sound.Enabled")) {
-                String soundType = Main.getInstance().getConfigManager().getConfig().getString("Discord.NotifyAboutMentions.Sound.Type");
-                float volume = (float) Main.getInstance().getConfigManager().getConfig().getDouble("Discord.NotifyAboutMentions.Sound.Volume");
-                float pitch = (float) Main.getInstance().getConfigManager().getConfig().getDouble("Discord.NotifyAboutMentions.Sound.Pitch");
+            if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("NotifyAboutMentions.Sound.Enabled")) {
+                String soundType = Main.getInstance().getConfigManager().getBotSettings().getString("NotifyAboutMentions.Sound.Type");
+                float volume = (float) Main.getInstance().getConfigManager().getBotSettings().getDouble("NotifyAboutMentions.Sound.Volume");
+                float pitch = (float) Main.getInstance().getConfigManager().getBotSettings().getDouble("NotifyAboutMentions.Sound.Pitch");
                 player.playSound(player.getLocation(), Sound.valueOf(soundType.toUpperCase()), volume, pitch);
             }
 

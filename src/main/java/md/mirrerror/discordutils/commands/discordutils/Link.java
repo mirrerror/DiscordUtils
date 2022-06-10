@@ -42,14 +42,14 @@ public class Link implements SubCommand {
         } else {
             Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".userId", "" + BotController.getLinkCodes().get(args[0]).getId());
 
-            boolean defaultValue = Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.Default2FAValue");
+            boolean defaultValue = Main.getInstance().getConfigManager().getBotSettings().getBoolean("Default2FAValue");
 
             Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId() + ".2factor", defaultValue);
             Main.getInstance().getConfigManager().saveConfigFiles();
         }
 
-        if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.VerifiedRole.Enabled")) {
-            long roleId = Main.getInstance().getConfigManager().getConfig().getLong("Discord.VerifiedRole.Id");
+        if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("VerifiedRole.Enabled")) {
+            long roleId = Main.getInstance().getConfigManager().getBotSettings().getLong("VerifiedRole.Id");
             if(roleId > 0) {
                 BotController.getJda().getGuilds().forEach(guild -> {
                     Role verifiedRole = DiscordUtils.getVerifiedRole(guild);
@@ -60,7 +60,7 @@ public class Link implements SubCommand {
 
         BotController.getLinkCodes().remove(args[0]);
         Message.ACCOUNT_SUCCESSFULLY_LINKED.getFormattedText(true).forEach(sender::sendMessage);
-        Main.getInstance().getConfigManager().getConfig().getStringList("Discord.CommandsAfterVerification").forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName())));
+        Main.getInstance().getConfigManager().getBotSettings().getStringList("CommandsAfterVerification").forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName())));
     }
 
     @Override

@@ -26,7 +26,7 @@ public class ServerActivityLoggerHandler implements Listener {
                 embedManager.embed(
                         Message.CHAT_LOGGING_EMBED_TITLE.getText().replace("%player%", player.getName()).replace("%message%", message),
                         Message.CHAT_LOGGING_EMBED_TEXT.getText().replace("%player%", player.getName()).replace("%message%", message),
-                        Color.decode(Main.getInstance().getConfigManager().getConfig().getString("Discord.ServerActivityLogging.ChatEmbedColor"))
+                        Color.decode(Main.getInstance().getConfigManager().getBotSettings().getString("ServerActivityLogging.ChatEmbedColor"))
                 )
         ).queue();
     }
@@ -38,7 +38,7 @@ public class ServerActivityLoggerHandler implements Listener {
                 embedManager.embed(
                         Message.JOIN_LOGGING_EMBED_TITLE.getText().replace("%player%", player.getName()),
                         Message.JOIN_LOGGING_EMBED_TEXT.getText().replace("%player%", player.getName()),
-                        Color.decode(Main.getInstance().getConfigManager().getConfig().getString("Discord.ServerActivityLogging.JoinEmbedColor"))
+                        Color.decode(Main.getInstance().getConfigManager().getBotSettings().getString("ServerActivityLogging.JoinEmbedColor"))
                 )
         ).queue();
     }
@@ -50,7 +50,7 @@ public class ServerActivityLoggerHandler implements Listener {
                 embedManager.embed(
                         Message.QUIT_LOGGING_EMBED_TITLE.getText().replace("%player%", player.getName()),
                         Message.QUIT_LOGGING_EMBED_TEXT.getText().replace("%player%", player.getName()),
-                        Color.decode(Main.getInstance().getConfigManager().getConfig().getString("Discord.ServerActivityLogging.QuitEmbedColor"))
+                        Color.decode(Main.getInstance().getConfigManager().getBotSettings().getString("ServerActivityLogging.QuitEmbedColor"))
                 )
         ).queue();
     }
@@ -62,7 +62,7 @@ public class ServerActivityLoggerHandler implements Listener {
                 embedManager.embed(
                         Message.DEATH_LOGGING_EMBED_TITLE.getText().replace("%player%", player.getName()),
                         Message.DEATH_LOGGING_EMBED_TEXT.getText().replace("%player%", player.getName()),
-                        Color.decode(Main.getInstance().getConfigManager().getConfig().getString("Discord.ServerActivityLogging.DeathEmbedColor"))
+                        Color.decode(Main.getInstance().getConfigManager().getBotSettings().getString("ServerActivityLogging.DeathEmbedColor"))
                 )
         ).queue();
     }

@@ -32,7 +32,7 @@ public class Events implements Listener {
     private final List<String> allowedCommands = new ArrayList<>();
 
     public Events() {
-        allowedCommands.addAll(Main.getInstance().getConfigManager().getConfig().getStringList("Discord.AllowedCommandsBeforePassing2FA"));
+        allowedCommands.addAll(Main.getInstance().getConfigManager().getBotSettings().getStringList("AllowedCommandsBeforePassing2FA"));
         Iterator<String> stringIterator = allowedCommands.iterator();
         int index = 0;
         while(stringIterator.hasNext()) {
@@ -50,14 +50,18 @@ public class Events implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> DiscordUtils.checkRoles(player));
-        Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> DiscordUtils.checkNames(player));
+        if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("RolesSynchronization.Enabled") && Main.getPermissionsPlugin() != Main.PermissionsPlugin.NONE)
+            Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> DiscordUtils.checkRoles(player));
+
+        if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("NamesSynchronization.Enabled"))
+            Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> DiscordUtils.checkNames(player));
+
         if(DiscordUtils.hasTwoFactor(player)) {
             String playerIp = StringUtils.remove(player.getAddress().getAddress().toString(), '/');
 
-            if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.2FASessions"))
+            if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("2FASessions"))
                 if(BotController.getSessions().containsKey(player.getUniqueId())) {
-                    if(Main.getInstance().getConfigManager().getConfig().getLong("Discord.2FASessionTime") > 0) {
+                    if(Main.getInstance().getConfigManager().getBotSettings().getLong("2FASessionTime") > 0) {
 
                         if(BotController.getSessions().get(player.getUniqueId()).getEnd().isAfter(LocalDateTime.now()))
                             if(BotController.getSessions().get(player.getUniqueId()).getIpAddress().equals(playerIp)) return;
@@ -66,6 +70,7 @@ public class Events implements Listener {
                 }
 
             EmbedManager embedManager = new EmbedManager();
+
             if(Main.getTwoFactorType() == Main.TwoFactorType.REACTION) {
                 DiscordUtils.getDiscordUser(player).openPrivateChannel().submit()
                 .thenCompose(channel -> channel.sendMessageEmbeds(embedManager.infoEmbed(Message.TWOFACTOR_REACTION_MESSAGE.getText().replace("%playerIp%", playerIp))).submit())
@@ -97,7 +102,7 @@ public class Events implements Listener {
                 });
             }
 
-            long timeToAuthorize = Main.getInstance().getConfigManager().getConfig().getLong("Discord.2FATimeToAuthorize");
+            long timeToAuthorize = Main.getInstance().getConfigManager().getBotSettings().getLong("2FATimeToAuthorize");
 
             if(timeToAuthorize > 0) Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
                 if(player != null) {
@@ -106,7 +111,7 @@ public class Events implements Listener {
             }, timeToAuthorize*20L);
         }
 
-        if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.NotifyAboutDisabled2FA")) {
+        if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("NotifyAboutDisabled2FA")) {
             if(!DiscordUtils.hasTwoFactor(player)) Message.TWOFACTOR_DISABLED_REMINDER.getFormattedText(true).forEach(player::sendMessage);
         }
     }
@@ -114,8 +119,12 @@ public class Events implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDisconnect(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> DiscordUtils.checkRoles(player));
-        Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> DiscordUtils.checkNames(player));
+
+        if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("RolesSynchronization.Enabled") && Main.getPermissionsPlugin() != Main.PermissionsPlugin.NONE)
+            Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> DiscordUtils.checkRoles(player));
+        if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("NamesSynchronization.Enabled"))
+            Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> DiscordUtils.checkNames(player));
+
         BotController.getTwoFactorPlayers().remove(player);
     }
 
@@ -141,7 +150,7 @@ public class Events implements Listener {
     public void onCommand(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
         if(BotController.getTwoFactorPlayers().containsKey(player) ||
-                Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.ForceVerification") && !DiscordUtils.isVerified(player)) {
+                Main.getInstance().getConfigManager().getBotSettings().getBoolean("ForceVerification") && !DiscordUtils.isVerified(player)) {
 
             if(!isAllowedCommand(event.getMessage().substring(1))) {
                 checkTwoFactor(event.getPlayer(), event);
@@ -162,7 +171,10 @@ public class Events implements Listener {
                 BotController.getTwoFactorPlayers().remove(player);
                 Message.TWOFACTOR_AUTHORIZED.getFormattedText(true).forEach(player::sendMessage);
                 BotController.getSessions().put(player.getUniqueId(), new TwoFactorSession(playerIp,
-                        LocalDateTime.now().plusSeconds(Main.getInstance().getConfigManager().getConfig().getLong("Discord.2FASessionTime"))));
+                        LocalDateTime.now().plusSeconds(Main.getInstance().getConfigManager().getBotSettings().getLong("2FASessionTime"))));
+                Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
+                    Main.getInstance().getConfigManager().getBotSettings().getStringList("CommandsAfter2FAPassing").forEach(cmd -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd.replace("%player%", player.getName())));
+                });
             } else {
                 int attempts = 1;
                 if(BotController.getTwoFactorAttempts().containsKey(playerIp)) {
@@ -171,9 +183,9 @@ public class Events implements Listener {
                 } else {
                     BotController.getTwoFactorAttempts().put(playerIp, attempts);
                 }
-                if(Main.getInstance().getConfigManager().getConfig().getConfigurationSection("Discord.ActionsAfterFailing2FA." + attempts) != null) {
-                    List<String> messages = Main.getInstance().getConfigManager().getConfig().getStringList("Discord.ActionsAfterFailing2FA." + attempts + ".Messages");
-                    List<String> commands = Main.getInstance().getConfigManager().getConfig().getStringList("Discord.ActionsAfterFailing2FA." + attempts + ".Commands");
+                if(Main.getInstance().getConfigManager().getBotSettings().getConfigurationSection("ActionsAfterFailing2FA." + attempts) != null) {
+                    List<String> messages = Main.getInstance().getConfigManager().getBotSettings().getStringList("ActionsAfterFailing2FA." + attempts + ".Messages");
+                    List<String> commands = Main.getInstance().getConfigManager().getBotSettings().getStringList("ActionsAfterFailing2FA." + attempts + ".Commands");
                     if(messages != null) {
                         messages.forEach(msg -> player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg.replace("%player%", player.getName()))));
                     }
@@ -222,7 +234,7 @@ public class Events implements Listener {
             player.getInventory().addItem(event.getBrokenItem());
             Message.TWOFACTOR_NEEDED.getFormattedText(true).forEach(player::sendMessage);
         }
-        if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.ForceVerification") && !DiscordUtils.isVerified(player)) {
+        if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("ForceVerification") && !DiscordUtils.isVerified(player)) {
             player.getInventory().addItem(event.getBrokenItem());
             Message.VERIFICATION_NEEDED.getFormattedText(true).forEach(player::sendMessage);
         }
@@ -260,7 +272,7 @@ public class Events implements Listener {
     }
 
     private void checkVerification(Player player, Cancellable event) {
-        if(Main.getInstance().getConfigManager().getConfig().getBoolean("Discord.ForceVerification")) {
+        if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("ForceVerification")) {
             if(!DiscordUtils.isVerified(player)) {
                 event.setCancelled(true);
                 Message.VERIFICATION_NEEDED.getFormattedText(true).forEach(player::sendMessage);
