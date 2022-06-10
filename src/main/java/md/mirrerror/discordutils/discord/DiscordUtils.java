@@ -210,7 +210,7 @@ public class DiscordUtils {
                 Member member = guild.getMember(user);
                 if(member == null) return;
                 if(!guild.getMember(BotController.getJda().getSelfUser()).canInteract(member)) return;
-                member.modifyNickname(Main.getInstance().getConfigManager().getBotSettings().getString("NamesSyncFormat")
+                member.modifyNickname(Main.getInstance().getConfigManager().getBotSettings().getString("NamesSynchronization.NamesSyncFormat")
                         .replace("%player%", offlinePlayer.getName())).queue();
             }
         });
