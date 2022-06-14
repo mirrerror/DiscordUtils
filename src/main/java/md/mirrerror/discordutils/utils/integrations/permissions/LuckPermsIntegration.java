@@ -8,9 +8,7 @@ import net.luckperms.api.model.user.User;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class LuckPermsIntegration implements PermissionsIntegration {
 
@@ -29,9 +27,24 @@ public class LuckPermsIntegration implements PermissionsIntegration {
                 }
             }
         } catch (IllegalStateException ignored) {
-            Main.getInstance().getLogger().severe("Something went wrong while using LuckPerms integration. Probably, there is not the LuckPerms plugin installed on your server.");
+            Main.getInstance().getLogger().severe("Something went wrong while using the LuckPerms integration. Probably, there is not the LuckPerms plugin installed on your server.");
         }
         return groups;
+    }
+
+    @Override
+    public String getHighestUserGroup(Player player) {
+        try {
+            LuckPerms api = LuckPermsProvider.get();
+            User user = api.getUserManager().getUser(player.getUniqueId());
+            if(user == null) user = api.getUserManager().loadUser(player.getUniqueId()).join();
+
+            if(user != null) return user.getPrimaryGroup();
+        } catch (IllegalStateException ignored) {
+            Main.getInstance().getLogger().severe("Something went wrong while using the LuckPerms integration. Probably, there is not the LuckPerms plugin installed on your server.");
+        }
+
+        return null;
     }
 
     @Override
@@ -49,9 +62,24 @@ public class LuckPermsIntegration implements PermissionsIntegration {
                 }
             }
         } catch (IllegalStateException ignored) {
-            Main.getInstance().getLogger().severe("Something went wrong while using LuckPerms integration. Probably, there is not the LuckPerms plugin installed on your server.");
+            Main.getInstance().getLogger().severe("Something went wrong while using the LuckPerms integration. Probably, there is not the LuckPerms plugin installed on your server.");
         }
         return groups;
+    }
+
+    @Override
+    public String getHighestUserGroup(OfflinePlayer offlinePlayer) {
+        try {
+            LuckPerms api = LuckPermsProvider.get();
+            User user = api.getUserManager().getUser(offlinePlayer.getUniqueId());
+            if(user == null) user = api.getUserManager().loadUser(offlinePlayer.getUniqueId()).join();
+
+            if(user != null) return user.getPrimaryGroup();
+        } catch (IllegalStateException ignored) {
+            Main.getInstance().getLogger().severe("Something went wrong while using the LuckPerms integration. Probably, there is not the LuckPerms plugin installed on your server.");
+        }
+
+        return null;
     }
 
 }

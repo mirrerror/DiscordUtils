@@ -158,44 +158,95 @@ public class DiscordUtils {
         if(!DiscordUtils.isVerified(offlinePlayer)) return;
         PermissionsIntegration permissionsIntegration = Main.getPermissionsPlugin().getPermissionsIntegration();
         if(permissionsIntegration == null) return;
-        List<String> groups = permissionsIntegration.getUserGroups(offlinePlayer);
-        Map<Long, String> groupRoles = BotController.getGroupRoles();
 
         User user = DiscordUtils.getDiscordUser(offlinePlayer);
-
         if(user == null) return;
         AtomicReference<Member> member = new AtomicReference<>();
 
-        for(Long roleId : groupRoles.keySet()) {
-            String group = groupRoles.get(roleId);
-            Role role = BotController.getJda().getRoleById(roleId);
-            if(groups.contains(group)) {
-                BotController.getJda().getGuilds().forEach(guild -> {
+        Map<Long, String> groupRoles = BotController.getGroupRoles();
 
-                    if(guild.isMember(user)) member.set(guild.getMember(user));
+        if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("RolesSynchronization.AssignOnlyPrimaryGroup")) {
 
-                    if(member.get() != null) {
-                        try {
-                            if(role != null) if(isPartOfGuild(role, guild)) guild.addRoleToMember(member.get(), role).queue();
-                        } catch (HierarchyException exception) {
-                            Main.getInstance().getLogger().warning("Couldn't assign a role for member: " + user.getAsTag() + ". The bot probably doesn't have the needed permissions.");
+            String primaryGroup = permissionsIntegration.getHighestUserGroup(offlinePlayer);
+
+            for(Long roleId : groupRoles.keySet()) {
+                String group = groupRoles.get(roleId);
+                Role role = BotController.getJda().getRoleById(roleId);
+
+                if(primaryGroup.equals(group)) {
+                    BotController.getJda().getGuilds().forEach(guild -> {
+
+                        if(guild.isMember(user)) member.set(guild.getMember(user));
+
+                        if(member.get() != null) {
+                            try {
+                                if(role != null)
+                                    if(isPartOfGuild(role, guild))
+                                        if(!member.get().getRoles().contains(role)) guild.addRoleToMember(member.get(), role).queue();
+                            } catch (HierarchyException exception) {
+                                Main.getInstance().getLogger().warning("Couldn't assign a role for member: " + user.getAsTag() + ". The bot probably doesn't have the needed permissions.");
+                            }
                         }
-                    }
-                });
-            } else {
-                BotController.getJda().getGuilds().forEach(guild -> {
+                    });
+                } else {
+                    BotController.getJda().getGuilds().forEach(guild -> {
 
-                    if(guild.isMember(user)) member.set(guild.getMember(user));
+                        if(guild.isMember(user)) member.set(guild.getMember(user));
 
-                    if(member.get() != null) {
-                        try {
-                            if(role != null) if(isPartOfGuild(role, guild)) guild.removeRoleFromMember(member.get(), role).queue();
-                        } catch (HierarchyException exception) {
-                            Main.getInstance().getLogger().warning("Couldn't remove a role from member: " + user.getAsTag() + ". The bot probably doesn't have the needed permissions.");
+                        if(member.get() != null) {
+                            try {
+                                if(role != null)
+                                    if(isPartOfGuild(role, guild))
+                                        if(member.get().getRoles().contains(role)) guild.removeRoleFromMember(member.get(), role).queue();
+                            } catch (HierarchyException exception) {
+                                Main.getInstance().getLogger().warning("Couldn't remove a role from member: " + user.getAsTag() + ". The bot probably doesn't have the needed permissions.");
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
+
+        } else {
+
+            List<String> groups = permissionsIntegration.getUserGroups(offlinePlayer);
+
+            for(Long roleId : groupRoles.keySet()) {
+                String group = groupRoles.get(roleId);
+                Role role = BotController.getJda().getRoleById(roleId);
+
+                if(groups.contains(group)) {
+                    BotController.getJda().getGuilds().forEach(guild -> {
+
+                        if(guild.isMember(user)) member.set(guild.getMember(user));
+
+                        if(member.get() != null) {
+                            try {
+                                if(role != null)
+                                    if(isPartOfGuild(role, guild))
+                                        if(!member.get().getRoles().contains(role)) guild.addRoleToMember(member.get(), role).queue();
+                            } catch (HierarchyException exception) {
+                                Main.getInstance().getLogger().warning("Couldn't assign a role for member: " + user.getAsTag() + ". The bot probably doesn't have the needed permissions.");
+                            }
+                        }
+                    });
+                } else {
+                    BotController.getJda().getGuilds().forEach(guild -> {
+
+                        if(guild.isMember(user)) member.set(guild.getMember(user));
+
+                        if(member.get() != null) {
+                            try {
+                                if(role != null)
+                                    if(isPartOfGuild(role, guild))
+                                        if(member.get().getRoles().contains(role)) guild.removeRoleFromMember(member.get(), role).queue();
+                            } catch (HierarchyException exception) {
+                                Main.getInstance().getLogger().warning("Couldn't remove a role from member: " + user.getAsTag() + ". The bot probably doesn't have the needed permissions.");
+                            }
+                        }
+                    });
+                }
+            }
+
         }
     }
 
@@ -210,8 +261,14 @@ public class DiscordUtils {
                 Member member = guild.getMember(user);
                 if(member == null) return;
                 if(!guild.getMember(BotController.getJda().getSelfUser()).canInteract(member)) return;
-                member.modifyNickname(Main.getInstance().getConfigManager().getBotSettings().getString("NamesSynchronization.NamesSyncFormat")
-                        .replace("%player%", offlinePlayer.getName())).queue();
+
+                String format = Main.getInstance().getConfigManager().getBotSettings().getString("NamesSynchronization.NamesSyncFormat")
+                        .replace("%player%", offlinePlayer.getName());
+                if(Main.getInstance().getPapiManager().isEnabled()) format = Main.getInstance().getPapiManager().setPlaceholders(offlinePlayer, format);
+
+                if(member.getNickname().equals(format)) return;
+
+                member.modifyNickname(format).queue();
             }
         });
     }
@@ -221,18 +278,6 @@ public class DiscordUtils {
     }
 
     public static void setupDelayedRolesCheck() {
-        /*Bukkit.getScheduler().runTaskTimerAsynchronously(Main.getInstance(), () -> {
-            Main.getInstance().getConfigManager().getData().getConfigurationSection("DiscordLink").getKeys(false).forEach(verified -> {
-
-                try {
-                    checkRoles(Bukkit.getOfflinePlayer(UUID.fromString(verified)));
-                } catch (NoClassDefFoundError exception) {
-                    Main.getInstance().getLogger().severe("");
-                }
-
-            });
-        }, 0L, Main.getInstance().getConfigManager().getConfig().getInt("Discord.DelayedRolesCheck.Delay")*20L);*/
-
         new BukkitRunnable() {
 
             @Override

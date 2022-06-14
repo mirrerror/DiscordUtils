@@ -28,8 +28,18 @@ public class VaultIntegration implements PermissionsIntegration {
     }
 
     @Override
+    public String getHighestUserGroup(Player player) {
+        return perms.getPrimaryGroup(player);
+    }
+
+    @Override
     public List<String> getUserGroups(OfflinePlayer offlinePlayer) {
         return new ArrayList<>(Arrays.asList(perms.getPlayerGroups(null, offlinePlayer)));
+    }
+
+    @Override
+    public String getHighestUserGroup(OfflinePlayer offlinePlayer) {
+        return perms.getPrimaryGroup(null, offlinePlayer);
     }
 
     public boolean setupPermissions() {

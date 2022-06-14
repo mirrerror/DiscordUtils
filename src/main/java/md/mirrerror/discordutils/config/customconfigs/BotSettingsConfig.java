@@ -49,6 +49,7 @@ public class BotSettingsConfig extends CustomConfig {
         getFileConfiguration().addDefault("CommandsAfterUnlink", Collections.emptyList());
         getFileConfiguration().addDefault("CommandsAfterServerBoosting", Collections.emptyList());
         getFileConfiguration().addDefault("RolesSynchronization.Enabled", true);
+        getFileConfiguration().addDefault("RolesSynchronization.AssignOnlyPrimaryGroup", true);
         getFileConfiguration().addDefault("RolesSynchronization.DelayedRolesCheck.Enabled", true);
         getFileConfiguration().addDefault("RolesSynchronization.DelayedRolesCheck.Delay", 30);
         getFileConfiguration().addDefault("NamesSynchronization.Enabled", true);

@@ -91,6 +91,7 @@
 # RolesSynchronization
 # Synchronization of the in-game permission groups and Discord roles
 # Enabled - true - enable, false - disable
+# AssignOnlyPrimaryGroup - true - assign only player's primary group role, false - assign all player's groups roles
 # DelayedRolesCheck - whether to enable or disable the roles check every Delay seconds (if it is disable, the plugin will check it only when players join and leave the server)
 # Enabled - true - enable, false - disable
 # Delay - checks delay
@@ -98,7 +99,7 @@
 # NamesSynchronization
 # Synchronization of the in-game nicknames and Discord nicknames
 # Enabled - true - enable, false - disable
-# NamesSyncFormat - nicknames format (%player% - placeholder for the player nickname)
+# NamesSyncFormat - nicknames format (%player% - placeholder for the player nickname) (supports PAPI placeholders)
 # DelayedNamesCheck - whether to enable or disable the nicknames check every Delay seconds (if it is disable, the plugin will check it only when players join and leave the server)
 # Enabled - true - enable, false - disable
 # Delay - checks delay
@@ -200,6 +201,7 @@ CommandsAfterUnlink: []
 CommandsAfterServerBoosting: []
 RolesSynchronization:
   Enabled: true
+  AssignOnlyPrimaryGroup: true
   DelayedRolesCheck:
     Enabled: true
     Delay: 30

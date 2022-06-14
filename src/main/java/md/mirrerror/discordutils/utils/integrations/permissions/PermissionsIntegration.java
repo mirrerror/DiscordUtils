@@ -8,6 +8,8 @@ import java.util.List;
 public interface PermissionsIntegration {
 
     List<String> getUserGroups(Player player);
+    String getHighestUserGroup(Player player);
     List<String> getUserGroups(OfflinePlayer offlinePlayer);
+    String getHighestUserGroup(OfflinePlayer offlinePlayer);
 
 }

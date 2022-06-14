@@ -76,9 +76,13 @@ public class BotController {
             }
             if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("RolesSynchronization.Enabled") && Main.getPermissionsPlugin() != Main.PermissionsPlugin.NONE) {
                 DiscordUtils.setupDelayedRolesCheck();
+            } else {
+                Main.getInstance().getLogger().warning("Roles synchronization has been disabled due to the lacking of the specified permissions plugin or disabling this option in the config.");
             }
             if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("NamesSynchronization.Enabled")) {
                 DiscordUtils.setupDelayedNamesCheck();
+            } else {
+                Main.getInstance().getLogger().warning("Names synchronization has been disabled due to disabling this option in the config.");
             }
 
             if(Main.getInstance().getConfigManager().getBotSettings().getBoolean("ServerActivityLogging.Enabled")) {
