@@ -5,6 +5,7 @@ import md.mirrerror.discordutils.config.Message;
 import md.mirrerror.discordutils.discord.BotController;
 import md.mirrerror.discordutils.discord.DiscordUtils;
 import md.mirrerror.discordutils.discord.EmbedManager;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -19,6 +20,7 @@ public class ConsoleCommandsListener extends ListenerAdapter {
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if(event.getAuthor().isBot() || event.isWebhookMessage()) return;
         if(!event.isFromGuild()) return;
+        if(event.getChannelType() != ChannelType.TEXT) return;
 
         TextChannel textChannel = event.getTextChannel();
 
