@@ -39,19 +39,20 @@ public class EventListener extends ListenerAdapter {
                     } else {
                         Main.getInstance().getConfigManager().getData().set("DiscordLink." + player.getUniqueId(), null);
                         Main.getInstance().getConfigManager().saveConfigFiles();
-
-                        long roleId = Main.getInstance().getConfigManager().getBotSettings().getLong("VerifiedRole.Id");
-                        if(roleId > 0) {
-                            BotController.getJda().getGuilds().forEach(guild -> {
-                                Role verifiedRole = DiscordUtils.getVerifiedRole(guild);
-                                Member member = null;
-
-                                if(guild.isMember(event.getUser())) member = guild.getMember(event.getUser());
-
-                                if(verifiedRole != null && member != null) guild.removeRoleFromMember(member, verifiedRole).queue();
-                            });
-                        }
                     }
+
+                    long roleId = Main.getInstance().getConfigManager().getBotSettings().getLong("VerifiedRole.Id");
+                    if(roleId > 0) {
+                        BotController.getJda().getGuilds().forEach(guild -> {
+                            Role verifiedRole = DiscordUtils.getVerifiedRole(guild);
+                            Member member = null;
+
+                            if(guild.isMember(event.getUser())) member = guild.getMember(event.getUser());
+
+                            if(verifiedRole != null && member != null) if(member.getRoles().contains(verifiedRole)) guild.removeRoleFromMember(member, verifiedRole).queue();
+                        });
+                    }
+
                     BotController.getUnlinkPlayers().remove(player);
                     Message.ACCOUNT_SUCCESSFULLY_UNLINKED.getFormattedText(true).forEach(player::sendMessage);
                     Bukkit.getScheduler().runTask(Main.getInstance(), () -> {

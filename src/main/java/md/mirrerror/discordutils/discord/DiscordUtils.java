@@ -266,7 +266,7 @@ public class DiscordUtils {
                         .replace("%player%", offlinePlayer.getName());
                 if(Main.getInstance().getPapiManager().isEnabled()) format = Main.getInstance().getPapiManager().setPlaceholders(offlinePlayer, format);
 
-                if(member.getNickname().equals(format)) return;
+                if(member.getNickname() != null) if(member.getNickname().equals(format)) return;
 
                 member.modifyNickname(format).queue();
             }
